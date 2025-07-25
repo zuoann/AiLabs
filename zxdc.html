@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RailEats - 高铁在线点餐</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00A896;
+            --secondary: #028090;
+            --accent: #F0F3BD;
+            --dark: #05668D;
+            --light: #FFFFFF;
+            --gray: #F5F5F5;
+            --text: #333333;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--gray), #e0f7fa);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            background: var(--light);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* 顶部导航 */
+        .top-bar {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: var(--light);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .logo i {
+            color: var(--accent);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info .icon {
+            background: rgba(255, 255, 255, 0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .user-info .icon:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* 列车信息 */
+        .train-info {
+            background: var(--dark);
+            color: var(--light);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+        
+        .train-detail {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .train-detail div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .train-detail span:first-child {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .train-detail span:last-child {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        /* 主内容区 */
+        .main-content {
+            display: flex;
+            min-height: 600px;
+        }
+        
+        /* 菜单分类 */
+        .categories {
+            width: 240px;
+            background: var(--gray);
+            padding: 20px 0;
+            border-right: 1px solid #e0e0e0;
+        }
+        
+        .category-item {
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .category-item:hover, .category-item.active {
+            background: var(--light);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .category-item i {
+            color: var(--primary);
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* 餐品区域 */
+        .food-section {
+            flex: 1;
+            padding: 30px;
+            background: var(--light);
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        
+        .food-card {
+            background: var(--light);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .food-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .food-image {
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .food-tag {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--accent);
+            color: var(--dark);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .food-details {
+            padding: 20px;
+        }
+        
+        .food-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .food-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            height: 40px;
+            overflow: hidden;
+        }
+        
+        .food-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .food-price {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+        
+        .add-to-cart {
+            background: var(--primary);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .add-to-cart:hover {
+            background: var(--secondary);
+            transform: scale(1.1);
+        }
+        
+        /* 购物车 */
+        .cart-container {
+            width: 350px;
+            background: var(--gray);
+            border-left: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .cart-header {
+            padding: 25px;
+            background: var(--dark);
+            color: var(--light);
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .cart-items {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .cart-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .cart-item-image {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .cart-item-details {
+            flex: 1;
+        }
+        
+        .cart-item-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .cart-item-price {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .cart-item-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .quantity-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        
+        .quantity {
+            font-weight: 600;
+            min-width: 20px;
+            text-align: center;
+        }
+        
+        .remove-btn {
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        
+        .cart-summary {
+            padding: 25px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .total {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: var(--primary);
+        }
+        
+        .checkout-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .checkout-btn:hover {
+            background: var(--secondary);
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            display: flex;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            padding: 10px;
+        }
+        
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            color: var(--primary);
+            background: rgba(0, 168, 150, 0.1);
+        }
+        
+        .nav-item i {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+        
+        .nav-item span {
+            font-size: 0.85rem;
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .categories {
+                width: 100%;
+                display: flex;
+                overflow-x: auto;
+                padding: 10px 0;
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+            
+            .category-item {
+                padding: 10px 20px;
+                white-space: nowrap;
+                border-left: none;
+            }
+            
+            .category-item.active {
+                border-bottom: 3px solid var(--primary);
+                border-left: none;
+            }
+            
+            .cart-container {
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid #e0e0e0;
+            }
+            
+            .food-section {
+                max-height: none;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .top-bar {
+                padding: 15px;
+            }
+            
+            .user-info .text {
+                display: none;
+            }
+            
+            .train-detail {
+                gap: 10px;
+                font-size: 0.8rem;
+            }
+            
+            .food-section {
+                padding: 20px;
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* 模拟高铁窗户效果 */
+        .window-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), transparent);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="window-effect"></div>
+        
+        <!-- 顶部导航 -->
+        <div class="top-bar">
+            <div class="logo">
+                <i class="fas fa-train"></i>
+                <span>RailEats</span>
+            </div>
+            <div class="user-info">
+                <div class="icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 列车信息 -->
+        <div class="train-info">
+            <div class="train-detail">
+                <div>
+                    <span>车次</span>
+                    <span>G123</span>
+                </div>
+                <div>
+                    <span>座位</span>
+                    <span>8车12F</span>
+                </div>
+                <div>
+                    <span>始发站</span>
+                    <span>北京南</span>
+                </div>
+                <div>
+                    <span>终点站</span>
+                    <span>上海虹桥</span>
+                </div>
+                <div>
+                    <span>预计到达</span>
+                    <span>14:30</span>
+                </div>
+            </div>
+            <div class="time">11:45 AM</div>
+        </div>
+        
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 菜单分类 -->
+            <div class="categories">
+                <div class="category-item active">
+                    <i class="fas fa-utensils"></i>
+                    <span>主食套餐</span>
+                </div>
+                <div class="category-item">
+                    <i class="fas fa-hamburger"></i>
+                    <span>西式简餐</span>
+                </div>
+                <div class="category-item">
+                    <i class="fas fa-bowl-food"></i>
+                    <span>中式快餐</span>
+                </div>
+                <div class="category-item">
+                    <i class="fas fa-mug-hot"></i>
+                    <span>热饮咖啡</span>
+                </div>
+                <div class="category-item">
+                    <i class="fas fa-glass-water"></i>
+                    <span>冷饮果汁</span>
+                </div>
+                <div class="category-item">
+                    <i class="fas fa-cookie"></i>
+                    <span>甜点小吃</span>
+                </div>
+                <div class="category-item">
+                    <i class="fas fa-apple-alt"></i>
+                    <span>健康轻食</span>
+                </div>
+            </div>
+            
+            <!-- 餐品展示 -->
+            <div class="food-section">
+                <!-- 餐品卡片1 -->
+                <div class="food-card fade-in">
+                    <div class="food-image" style="background-image: url('https://images.unsplash.com/photo-1563379926898-05f4575a45d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80');">
+                        <div class="food-tag">招牌推荐</div>
+                    </div>
+                    <div class="food-details">
+                        <div class="food-title">红烧牛肉套餐</div>
+                        <div class="food-description">精选牛腩肉，慢火炖煮，搭配时令蔬菜和米饭</div>
+                        <div class="food-footer">
+                            <div class="food-price">¥42</div>
+                            <button class="add-to-cart">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 餐品卡片2 -->
+                <div class="food-card fade-in">
+                    <div class="food-image" style="background-image: url('https://images.unsplash.com/photo-1606755962773-d324e0a13086?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80');">
+                        <div class="food-tag">热销</div>
+                    </div>
+                    <div class="food-details">
+                        <div class="food-title">黑椒牛排意面</div>
+                        <div class="food-description">嫩煎牛排配黑椒汁，意大利面搭配新鲜蔬菜</div>
+                        <div class="food-footer">
+                            <div class="food-price">¥48</div>
+                            <button class="add-to-cart">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 餐品卡片3 -->
+                <div class="food-card fade-in">
+                    <div class="food-image" style="background-image: url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80');">
+                        <div class="food-tag">新品</div>
+                    </div>
+                    <div class="food-details">
+                        <div class="food-title">鲜虾牛油果沙拉</div>
+                        <div class="food-description">新鲜大虾配牛油果，多种蔬菜和特调油醋汁</div>
+                        <div class="food-footer">
+                            <div class="food-price">¥38</div>
+                            <button class="add-to-cart">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 餐品卡片4 -->
+                <div class="food-card fade-in">
+                    <div class="food-image" style="background-image: url('https://images.unsplash.com/photo-1606491956689-2ea866880c84?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80');">
+                        <div class="food-tag">轻食</div>
+                    </div>
+                    <div class="food-details">
+                        <div class="food-title">香煎鸡胸藜麦饭</div>
+                        <div class="food-description">嫩煎鸡胸肉配三色藜麦，西兰花和胡萝卜</div>
+                        <div class="food-footer">
+                            <div class="food-price">¥36</div>
+                            <button class="add-to-cart">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 餐品卡片5 -->
+                <div class="food-card fade-in">
+                    <div class="food-image" style="background-image: url('https://images.unsplash.com/photo-1551024506-0bccd828d307?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80');">
+                        <div class="food-tag">热销</div>
+                    </div>
+                    <div class="food-details">
+                        <div class="food-title">经典美式咖啡</div>
+                        <div class="food-description">现磨咖啡豆，醇香浓郁，可选热/冰</div>
+                        <div class="food-footer">
+                            <div class="food-price">¥28</div>
+                            <button class="add-to-cart">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 餐品卡片6 -->
+                <div class="food-card fade-in">
+                    <div class="food-image" style="background-image: url('https://images.unsplash.com/photo-1554119921-6c2867afa7b2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80');">
+                        <div class="food-tag">新品</div>
+                    </div>
+                    <div class="food-details">
+                        <div class="food-title">抹茶芝士蛋糕</div>
+                        <div class="food-description">日式抹茶风味，浓郁芝士口感，搭配新鲜草莓</div>
+                        <div class="food-footer">
+                            <div class="food-price">¥32</div>
+                            <button class="add-to-cart">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 购物车 -->
+            <div class="cart-container">
+                <div class="cart-header">
+                    <i class="fas fa-shopping-cart"></i> 我的餐篮
+                </div>
+                <div class="cart-items">
+                    <!-- 购物车项1 -->
+                    <div class="cart-item">
+                        <div class="cart-item-image" style="background-image: url('https://images.unsplash.com/photo-1563379926898-05f4575a45d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80');"></div>
+                        <div class="cart-item-details">
+                            <div class="cart-item-name">红烧牛肉套餐</div>
+                            <div class="cart-item-price">¥42</div>
+                        </div>
+                        <div class="cart-item-actions">
+                            <div class="quantity-control">
+                                <button class="quantity-btn minus">-</button>
+                                <div class="quantity">1</div>
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <div class="remove-btn">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 购物车项2 -->
+                    <div class="cart-item">
+                        <div class="cart-item-image" style="background-image: url('https://images.unsplash.com/photo-1554119921-6c2867afa7b2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80');"></div>
+                        <div class="cart-item-details">
+                            <div class="cart-item-name">抹茶芝士蛋糕</div>
+                            <div class="cart-item-price">¥32</div>
+                        </div>
+                        <div class="cart-item-actions">
+                            <div class="quantity-control">
+                                <button class="quantity-btn minus">-</button>
+                                <div class="quantity">1</div>
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <div class="remove-btn">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>小计</span>
+                        <span>¥74</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>配送费</span>
+                        <span>¥0</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>优惠</span>
+                        <span>-¥5</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>总计</span>
+                        <span>¥69</span>
+                    </div>
+                    <button class="checkout-btn">
+                        <i class="fas fa-check-circle"></i>
+                        确认订单 (15分钟内送达)
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <div class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-search"></i>
+                <span>发现</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-shopping-cart"></i>
+                <span>订单</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-gift"></i>
+                <span>优惠</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 简单的交互逻辑
+        document.addEventListener('DOMContentLoaded', function() {
+            // 分类切换
+            const categories = document.querySelectorAll('.category-item');
+            categories.forEach(category => {
+                category.addEventListener('click', function() {
+                    categories.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // 添加购物车
+            const addButtons = document.querySelectorAll('.add-to-cart');
+            addButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const card = this.closest('.food-card');
+                    const title = card.querySelector('.food-title').textContent;
+                    const price = card.querySelector('.food-price').textContent;
+                    
+                    // 创建提示效果
+                    const originalHtml = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check"></i>';
+                    this.style.backgroundColor = '#28a745';
+                    
+                    setTimeout(() => {
+                        this.innerHTML = originalHtml;
+                        this.style.backgroundColor = '';
+                    }, 1000);
+                    
+                    // 这里可以添加实际添加到购物车的逻辑
+                    console.log(`已添加: ${title} - ${price}`);
+                });
+            });
+            
+            // 购物车数量控制
+            const minusButtons = document.querySelectorAll('.quantity-btn.minus');
+            const plusButtons = document.querySelectorAll('.quantity-btn.plus');
+            
+            minusButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const quantityElement = this.nextElementSibling;
+                    let quantity = parseInt(quantityElement.textContent);
+                    if(quantity > 1) {
+                        quantity--;
+                        quantityElement.textContent = quantity;
+                    }
+                });
+            });
+            
+            plusButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const quantityElement = this.previousElementSibling;
+                    let quantity = parseInt(quantityElement.textContent);
+                    quantity++;
+                    quantityElement.textContent = quantity;
+                });
+            });
+            
+            // 删除购物车项
+            const removeButtons = document.querySelectorAll('.remove-btn');
+            removeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const item = this.closest('.cart-item');
+                    item.style.opacity = '0';
+                    setTimeout(() => {
+                        item.style.display = 'none';
+                    }, 300);
+                });
+            });
+            
+            // 结账按钮
+            const checkoutBtn = document.querySelector('.checkout-btn');
+            checkoutBtn.addEventListener('click', function() {
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 下单中...';
+                setTimeout(() => {
+                    alert('下单成功！餐品将在15分钟内送达您的座位。');
+                    this.innerHTML = '<i class="fas fa-check-circle"></i> 确认订单 (15分钟内送达)';
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>
