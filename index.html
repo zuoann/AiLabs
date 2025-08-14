@@ -3,812 +3,428 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>www.205099.xyz</title>
+    <title>未来职业之门 | 新一代职业教育平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #0a0a1a;
+            color: #e0e0e0;
         }
-        
-        .container {
-            max-width: 900px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        
-        h1 {
-            font-size: 2.8rem;
-            margin-bottom: 5px;
-            text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
-            letter-spacing: 3px;
-            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .subtitle {
-            font-size: 1.1rem;
-            opacity: 0.8;
-            margin-top: -5px;
-            letter-spacing: 1px;
-        }
-        
-        .game-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            width: 100%;
-        }
-        
-        .game-board {
-            position: relative;
-            border: 3px solid #45b7d1;
-            border-radius: 8px;
-            background-color: rgba(0, 0, 0, 0.2);
-            box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
-            overflow: hidden;
-        }
-        
-        canvas {
-            display: block;
-        }
-        
-        .info-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 200px;
-        }
-        
-        .panel {
-            background: rgba(25, 25, 50, 0.7);
-            border: 2px solid #45b7d1;
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 0 15px rgba(0, 217, 255, 0.1);
-        }
-        
-        .panel h2 {
-            text-align: center;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-            color: #4ecdc4;
-        }
-        
-        .stats {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .stat {
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .stat span:first-child {
-            color: #aaa;
-        }
-        
-        .stat span:last-child {
-            font-weight: bold;
-            color: #ffd166;
-        }
-        
-        .next-piece {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        #nextCanvas {
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 5px;
-        }
-        
-        .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .btn {
-            background: linear-gradient(45deg, #45b7d1, #4ecdc4);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            font-size: 1.1rem;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-        }
-        
-        .btn:active {
-            transform: translateY(1px);
-        }
-        
-        .btn.pause {
-            background: linear-gradient(45deg, #ffd166, #ff9e6d);
-        }
-        
-        .btn.reset {
-            background: linear-gradient(45deg, #ef476f, #ff6b6b);
-        }
-        
-        .instructions {
-            margin-top: 10px;
-            background: rgba(25, 25, 50, 0.7);
-            border: 2px solid #4ecdc4;
-            border-radius: 10px;
-            padding: 15px;
-            width: 100%;
-            max-width: 600px;
-        }
-        
-        .instructions h2 {
-            text-align: center;
-            margin-bottom: 15px;
-            color: #ffd166;
-        }
-        
-        .keys {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 10px;
-        }
-        
-        .key-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .key {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid #45b7d1;
-            border-radius: 5px;
-            padding: 5px 10px;
-            min-width: 40px;
-            text-align: center;
-            font-weight: bold;
-        }
-        
-        .mobile-controls {
-            display: none;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 20px;
-            width: 100%;
-            max-width: 300px;
-        }
-        
-        .mobile-btn {
-            background: rgba(69, 183, 209, 0.3);
-            border: 2px solid #45b7d1;
-            color: white;
-            font-size: 1.5rem;
-            border-radius: 10px;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            user-select: none;
-        }
-        
-        .mobile-btn:active {
-            background: rgba(69, 183, 209, 0.6);
-        }
-        
-        .rotate {
-            grid-column: 2;
-            grid-row: 1;
-        }
-        
-        .left {
-            grid-column: 1;
-            grid-row: 2;
-        }
-        
-        .down {
-            grid-column: 2;
-            grid-row: 2;
-        }
-        
-        .right {
-            grid-column: 3;
-            grid-row: 2;
-        }
-        
-        .drop {
-            grid-column: 2;
-            grid-row: 3;
-        }
-        
-        .game-over {
+        #hero-canvas {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            border-radius: 8px;
-            display: none;
+            z-index: 0;
         }
-        
-        .game-over h2 {
-            font-size: 3rem;
-            color: #ef476f;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px rgba(239, 71, 111, 0.5);
+        .content-container {
+            position: relative;
+            z-index: 1;
         }
-        
-        footer {
-            margin-top: 20px;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9rem;
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
         }
-        
-        @media (max-width: 768px) {
-            .game-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .info-panel {
-                flex-direction: row;
-                flex-wrap: wrap;
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .panel {
-                min-width: 200px;
-            }
-            
-            .mobile-controls {
-                display: grid;
-            }
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
+            border-color: rgba(79, 70, 229, 0.7);
         }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .neon-text {
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #6366f1, 0 0 20px #6366f1, 0 0 25px #6366f1, 0 0 30px #6366f1, 0 0 35px #6366f1;
         }
-        
-        .pulse {
-            animation: pulse 0.5s ease-in-out;
+        .section-title {
+            background: -webkit-linear-gradient(45deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>俄罗斯方块</h1>
-            <p class="subtitle">经典益智游戏 - 挑战你的反应速度</p>
-        </header>
-        
-        <div class="game-container">
-            <div class="game-board">
-                <canvas id="tetris" width="300" height="600"></canvas>
-                <div class="game-over" id="gameOver">
-                    <h2>游戏结束!</h2>
-                    <button class="btn reset" id="restartBtn">重新开始</button>
-                </div>
+<body class="overflow-x-hidden">
+
+    <!-- 3D 背景画布 -->
+    <canvas id="hero-canvas"></canvas>
+
+    <div class="content-container">
+        <!-- 头部导航 -->
+        <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="navbar">
+            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <h1 class="text-2xl font-bold tracking-wider neon-text">
+                    <a href="#">未来职教</a>
+                </h1>
+                <nav class="hidden md:flex space-x-8 items-center">
+                    <a href="#courses" class="hover:text-indigo-400 transition-colors duration-300">核心课程</a>
+                    <a href="#why-us" class="hover:text-indigo-400 transition-colors duration-300">平台优势</a>
+                    <a href="#explore" class="hover:text-indigo-400 transition-colors duration-300">职业探索</a>
+                    <a href="#contact" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">立即咨询</a>
+                </nav>
+                <button class="md:hidden text-white" id="mobile-menu-button">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
             </div>
-            
-            <div class="info-panel">
-                <div class="panel">
-                    <h2>游戏信息</h2>
-                    <div class="stats">
-                        <div class="stat">
-                            <span>分数:</span>
-                            <span id="score">0</span>
+            <!-- 移动端菜单 -->
+            <div id="mobile-menu" class="hidden md:hidden bg-black bg-opacity-80 backdrop-blur-md">
+                <a href="#courses" class="block py-2 px-4 text-sm hover:bg-indigo-900">核心课程</a>
+                <a href="#why-us" class="block py-2 px-4 text-sm hover:bg-indigo-900">平台优势</a>
+                <a href="#explore" class="block py-2 px-4 text-sm hover:bg-indigo-900">职业探索</a>
+                <a href="#contact" class="block py-2 px-4 text-sm hover:bg-indigo-900">立即咨询</a>
+            </div>
+        </header>
+
+        <!-- 主视觉区域 -->
+        <section id="hero" class="h-screen flex items-center justify-center text-center">
+            <div class="px-4">
+                <h2 class="text-4xl md:text-6xl font-extrabold mb-4 tracking-wider neon-text fade-in-up">塑造未来，定义职业</h2>
+                <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8 text-gray-300 fade-in-up" style="transition-delay: 0.2s;">
+                    我们不只传授技能，更是连接你与未来产业的桥梁。在这里，开启你的高薪职业生涯。
+                </p>
+                <a href="#courses" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-full text-lg transition-all duration-300 transform hover:scale-105 fade-in-up" style="transition-delay: 0.4s;">
+                    探索前沿课程
+                </a>
+            </div>
+        </section>
+
+        <!-- 核心课程 -->
+        <section id="courses" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-4xl md:text-5xl font-bold section-title fade-in-up">面向未来的核心课程</h3>
+                    <p class="text-lg text-gray-400 mt-4 max-w-2xl mx-auto fade-in-up" style="transition-delay: 0.2s;">紧跟行业趋势，我们提供最具潜力的职业技能培训。</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- 课程卡片 1 -->
+                    <div class="glass-card rounded-xl p-8 text-center fade-in-up">
+                        <div class="text-5xl text-indigo-400 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
                         </div>
-                        <div class="stat">
-                            <span>级别:</span>
-                            <span id="level">1</span>
+                        <h4 class="text-2xl font-bold mb-2">人工智能与大数据</h4>
+                        <p class="text-gray-400">学习机器学习、数据分析和AI应用开发，成为数字时代的架构师。</p>
+                    </div>
+                    <!-- 课程卡片 2 -->
+                    <div class="glass-card rounded-xl p-8 text-center fade-in-up" style="transition-delay: 0.2s;">
+                        <div class="text-5xl text-purple-400 mb-4">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </div>
-                        <div class="stat">
-                            <span>行数:</span>
-                            <span id="lines">0</span>
+                        <h4 class="text-2xl font-bold mb-2">元宇宙与VR/AR开发</h4>
+                        <p class="text-gray-400">掌握Unity/Unreal引擎，构建沉浸式虚拟世界，走在技术创新的最前沿。</p>
+                    </div>
+                    <!-- 课程卡片 3 -->
+                    <div class="glass-card rounded-xl p-8 text-center fade-in-up" style="transition-delay: 0.4s;">
+                        <div class="text-5xl text-teal-400 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                         </div>
-                        <div class="stat">
-                            <span>状态:</span>
-                            <span id="status">游戏中</span>
-                        </div>
+                        <h4 class="text-2xl font-bold mb-2">网络安全与云计算</h4>
+                        <p class="text-gray-400">学习防御网络攻击，掌握AWS/Azure云架构，成为企业数字资产的守护者。</p>
                     </div>
                 </div>
-                
-                <div class="panel next-piece">
-                    <h2>下一个方块</h2>
-                    <canvas id="nextPiece" width="150" height="150"></canvas>
+            </div>
+        </section>
+
+        <!-- 平台优势 -->
+        <section id="why-us" class="py-20 bg-black bg-opacity-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-4xl md:text-5xl font-bold section-title fade-in-up">为何选择我们？</h3>
+                    <p class="text-lg text-gray-400 mt-4 max-w-2xl mx-auto fade-in-up" style="transition-delay: 0.2s;">我们提供的不只是课程，而是一整套职业成功解决方案。</p>
                 </div>
-                
-                <div class="panel controls">
-                    <button class="btn" id="pauseBtn">暂停游戏</button>
-                    <button class="btn reset" id="resetBtn">重新开始</button>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                    <!-- 优势 1 -->
+                    <div class="fade-in-up">
+                        <div class="bg-indigo-900 bg-opacity-50 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4 border-2 border-indigo-700">
+                           <span class="text-4xl">🚀</span>
+                        </div>
+                        <h4 class="text-xl font-bold mb-2">企业级项目实战</h4>
+                        <p class="text-gray-400">直接参与真实商业项目，毕业即拥有丰富履历。</p>
+                    </div>
+                    <!-- 优势 2 -->
+                    <div class="fade-in-up" style="transition-delay: 0.2s;">
+                        <div class="bg-indigo-900 bg-opacity-50 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4 border-2 border-indigo-700">
+                            <span class="text-4xl">🤝</span>
+                        </div>
+                        <h4 class="text-xl font-bold mb-2">顶级导师一对一</h4>
+                        <p class="text-gray-400">行业大牛亲自指导，解决你学习中的所有难题。</p>
+                    </div>
+                    <!-- 优势 3 -->
+                    <div class="fade-in-up" style="transition-delay: 0.4s;">
+                        <div class="bg-indigo-900 bg-opacity-50 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4 border-2 border-indigo-700">
+                            <span class="text-4xl">💼</span>
+                        </div>
+                        <h4 class="text-xl font-bold mb-2">终身就业支持</h4>
+                        <p class="text-gray-400">与千家名企合作，提供无限次内部推荐机会。</p>
+                    </div>
+                    <!-- 优势 4 -->
+                    <div class="fade-in-up" style="transition-delay: 0.6s;">
+                        <div class="bg-indigo-900 bg-opacity-50 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4 border-2 border-indigo-700">
+                            <span class="text-4xl">🌐</span>
+                        </div>
+                        <h4 class="text-xl font-bold mb-2">全球化学员社区</h4>
+                        <p class="text-gray-400">与来自世界各地的同学交流，拓展你的人脉网络。</p>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
         
-        <div class="instructions">
-            <h2>游戏控制</h2>
-            <div class="keys">
-                <div class="key-item">
-                    <div class="key">←</div>
-                    <span>向左移动</span>
-                </div>
-                <div class="key-item">
-                    <div class="key">→</div>
-                    <span>向右移动</span>
-                </div>
-                <div class="key-item">
-                    <div class="key">↑</div>
-                    <span>旋转方块</span>
-                </div>
-                <div class="key-item">
-                    <div class="key">↓</div>
-                    <span>加速下落</span>
-                </div>
-                <div class="key-item">
-                    <div class="key">空格</div>
-                    <span>直接落下</span>
-                </div>
-                <div class="key-item">
-                    <div class="key">P</div>
-                    <span>暂停游戏</span>
+        <!-- 职业探索 -->
+        <section id="explore" class="py-20 text-center">
+            <div class="container mx-auto px-6">
+                <h3 class="text-4xl md:text-5xl font-bold section-title mb-4 fade-in-up">交互式职业路径探索</h3>
+                <p class="text-lg text-gray-400 max-w-3xl mx-auto mb-8 fade-in-up" style="transition-delay: 0.2s;">迷茫未来方向？拖动下方的职业网络图，探索不同技能如何连接到高薪职位，发现你的专属成长路径。</p>
+                <div id="career-graph-container" class="w-full h-96 md:h-[600px] glass-card rounded-2xl fade-in-up" style="transition-delay: 0.4s;">
+                    <!-- 3D 职业网络图将在这里渲染 -->
                 </div>
             </div>
-        </div>
-        
-        <div class="mobile-controls">
-            <div class="mobile-btn rotate">↻</div>
-            <div class="mobile-btn left">←</div>
-            <div class="mobile-btn down">↓</div>
-            <div class="mobile-btn right">→</div>
-            <div class="mobile-btn drop">↓</div>
-        </div>
-        
-        <footer>
-            <p>© 2023 俄罗斯方块游戏 | 使用HTML5 Canvas实现</p>
+        </section>
+
+        <!-- 联系我们 -->
+        <section id="contact" class="py-20">
+            <div class="container mx-auto px-6 text-center">
+                <div class="glass-card rounded-2xl max-w-4xl mx-auto p-8 md:p-12 fade-in-up">
+                    <h3 class="text-3xl md:text-4xl font-bold mb-4">准备好开启你的未来了吗？</h3>
+                    <p class="text-gray-300 mb-8">立即留下信息，我们的职业规划专家将在24小时内与你联系，为你定制专属学习方案。</p>
+                    <form class="flex flex-col md:flex-row gap-4 max-w-lg mx-auto">
+                        <input type="tel" placeholder="输入你的手机号码" class="w-full bg-gray-900 bg-opacity-50 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 whitespace-nowrap">获取免费规划</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- 页脚 -->
+        <footer class="py-8 border-t border-gray-800">
+            <div class="container mx-auto px-6 text-center text-gray-500">
+                <p>&copy; 2025 未来职教. All Rights Reserved. </p>
+                <p class="text-sm mt-2">一个致力于连接人才与未来的创新教育平台。</p>
+            </div>
         </footer>
+
     </div>
 
     <script>
-        // 游戏常量
-        const COLS = 10;
-        const ROWS = 20;
-        const BLOCK_SIZE = 30;
-        const COLORS = [
-            null,
-            '#FF0D72', // I
-            '#0DC2FF', // J
-            '#0DFF72', // L
-            '#F538FF', // O
-            '#FF8E0D', // S
-            '#FFE138', // T
-            '#3877FF'  // Z
-        ];
-        
-        // 方块形状定义
-        const SHAPES = [
-            [],
-            [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]], // I
-            [[0, 0, 0], [1, 1, 1], [0, 0, 1]], // J
-            [[0, 0, 0], [1, 1, 1], [1, 0, 0]], // L
-            [[0, 0, 0, 0], [0, 1, 1, 0], [0, 1, 1, 0], [0, 0, 0, 0]], // O
-            [[0, 0, 0], [0, 1, 1], [1, 1, 0]], // S
-            [[0, 0, 0], [0, 1, 0], [1, 1, 1]], // T
-            [[0, 0, 0], [1, 1, 0], [0, 1, 1]]  // Z
-        ];
-        
-        // 游戏变量
-        let canvas, ctx, nextCanvas, nextCtx;
-        let board = [];
-        let score = 0;
-        let level = 1;
-        let lines = 0;
-        let gameOver = false;
-        let paused = false;
-        let dropCounter = 0;
-        let dropInterval = 1000;
-        let lastTime = 0;
-        let player = {
-            pos: {x: 0, y: 0},
-            matrix: null,
-            score: 0
+        // --- 3D 背景动画 (Three.js) ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        // FIX: Pass the actual canvas element to the renderer
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('hero-canvas'), alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const particlesGeometry = new THREE.BufferGeometry;
+        const particlesCnt = 5000;
+        const posArray = new Float32Array(particlesCnt * 3);
+        for(let i = 0; i < particlesCnt * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 5;
+        }
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.005,
+            color: 0x818cf8,
+        });
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+
+        camera.position.z = 2;
+
+        let mouseX = 0;
+        let mouseY = 0;
+        document.addEventListener('mousemove', (event) => {
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+        });
+
+        const clock = new THREE.Clock();
+        const animate = () => {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+            particlesMesh.rotation.y = -0.1 * elapsedTime;
+            particlesMesh.rotation.x = -0.1 * elapsedTime;
+            
+            // 鼠标交互
+            if (mouseX > 0) {
+                 particlesMesh.rotation.y += (mouseX - window.innerWidth / 2) * 0.00002;
+                 particlesMesh.rotation.x += (mouseY - window.innerHeight / 2) * 0.00002;
+            }
+
+            renderer.render(scene, camera);
         };
-        
-        // 初始化游戏
-        function init() {
-            canvas = document.getElementById('tetris');
-            ctx = canvas.getContext('2d');
-            nextCanvas = document.getElementById('nextPiece');
-            nextCtx = nextCanvas.getContext('2d');
-            
-            // 缩放Canvas
-            ctx.scale(BLOCK_SIZE, BLOCK_SIZE);
-            nextCtx.scale(BLOCK_SIZE, BLOCK_SIZE);
-            
-            // 初始化游戏板
-            createBoard();
-            
-            // 重置游戏状态
-            resetGame();
-            
-            // 开始游戏循环
-            requestAnimationFrame(gameLoop);
-        }
-        
-        // 创建游戏板
-        function createBoard() {
-            for (let y = 0; y < ROWS; y++) {
-                board[y] = [];
-                for (let x = 0; x < COLS; x++) {
-                    board[y][x] = 0;
-                }
-            }
-        }
-        
-        // 重置游戏
-        function resetGame() {
-            score = 0;
-            level = 1;
-            lines = 0;
-            gameOver = false;
-            paused = false;
-            dropInterval = 1000;
-            
-            document.getElementById('score').textContent = score;
-            document.getElementById('level').textContent = level;
-            document.getElementById('lines').textContent = lines;
-            document.getElementById('status').textContent = '游戏中';
-            document.getElementById('gameOver').style.display = 'none';
-            
-            createBoard();
-            resetPlayer();
-        }
-        
-        // 重置玩家
-        function resetPlayer() {
-            player.matrix = createPiece();
-            player.pos.y = 0;
-            player.pos.x = Math.floor(COLS / 2) - Math.floor(player.matrix[0].length / 2);
-            
-            if (collide()) {
-                gameOver = true;
-                document.getElementById('gameOver').style.display = 'flex';
-                document.getElementById('status').textContent = '游戏结束';
-            }
-            
-            // 绘制下一个方块预览
-            drawNextPiece();
-        }
-        
-        // 创建随机方块
-        function createPiece() {
-            const rand = Math.floor(Math.random() * 7) + 1;
-            return SHAPES[rand].map(row => [...row]);
-        }
-        
-        // 绘制方块
-        function drawPiece(matrix, offset) {
-            matrix.forEach((row, y) => {
-                row.forEach((value, x) => {
-                    if (value !== 0) {
-                        ctx.fillStyle = COLORS[value];
-                        ctx.fillRect(x + offset.x, y + offset.y, 1, 1);
-                        
-                        // 添加方块边框效果
-                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-                        ctx.lineWidth = 0.05;
-                        ctx.strokeRect(x + offset.x, y + offset.y, 1, 1);
-                    }
-                });
-            });
-        }
-        
-        // 绘制下一个方块预览
-        function drawNextPiece() {
-            nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
-            
-            // 绘制预览背景
-            nextCtx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-            nextCtx.fillRect(0, 0, 5, 5);
-            
-            // 绘制下一个方块
-            const matrix = createPiece();
-            matrix.forEach((row, y) => {
-                row.forEach((value, x) => {
-                    if (value !== 0) {
-                        nextCtx.fillStyle = COLORS[value];
-                        nextCtx.fillRect(x + 1, y + 1, 1, 1);
-                        
-                        // 添加方块边框效果
-                        nextCtx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-                        nextCtx.lineWidth = 0.05;
-                        nextCtx.strokeRect(x + 1, y + 1, 1, 1);
-                    }
-                });
-            });
-        }
-        
-        // 绘制游戏板
-        function drawBoard() {
-            // 绘制背景
-            ctx.fillStyle = '#111';
-            ctx.fillRect(0, 0, COLS, ROWS);
-            
-            // 绘制网格
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-            ctx.lineWidth = 0.02;
-            for (let y = 0; y < ROWS; y++) {
-                for (let x = 0; x < COLS; x++) {
-                    ctx.strokeRect(x, y, 1, 1);
-                }
-            }
-            
-            // 绘制已落下的方块
-            board.forEach((row, y) => {
-                row.forEach((value, x) => {
-                    if (value !== 0) {
-                        ctx.fillStyle = COLORS[value];
-                        ctx.fillRect(x, y, 1, 1);
-                        
-                        // 添加方块边框效果
-                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-                        ctx.lineWidth = 0.05;
-                        ctx.strokeRect(x, y, 1, 1);
-                    }
-                });
-            });
-        }
-        
-        // 绘制所有元素
-        function draw() {
-            drawBoard();
-            drawPiece(player.matrix, player.pos);
-        }
-        
-        // 碰撞检测
-        function collide() {
-            const [m, o] = [player.matrix, player.pos];
-            for (let y = 0; y < m.length; y++) {
-                for (let x = 0; x < m[y].length; x++) {
-                    if (m[y][x] !== 0 && 
-                       (board[y + o.y] && 
-                        board[y + o.y][x + o.x]) !== 0) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-        
-        // 玩家移动
-        function playerMove(dir) {
-            player.pos.x += dir;
-            if (collide()) {
-                player.pos.x -= dir;
-            }
-        }
-        
-        // 旋转玩家方块
-        function playerRotate() {
-            const pos = player.pos.x;
-            let offset = 1;
-            
-            // 转置矩阵
-            const matrix = [];
-            for (let y = 0; y < player.matrix[0].length; y++) {
-                matrix[y] = [];
-                for (let x = 0; x < player.matrix.length; x++) {
-                    matrix[y][x] = player.matrix[player.matrix.length - 1 - x][y];
-                }
-            }
-            
-            const original = player.matrix;
-            player.matrix = matrix;
-            
-            // 碰撞检测和位置调整
-            while (collide()) {
-                player.pos.x += offset;
-                offset = -(offset + (offset > 0 ? 1 : -1));
-                if (offset > player.matrix[0].length) {
-                    player.matrix = original;
-                    player.pos.x = pos;
-                    return;
-                }
-            }
-        }
-        
-        // 玩家下落
-        function playerDrop() {
-            player.pos.y++;
-            if (collide()) {
-                player.pos.y--;
-                merge();
-                resetPlayer();
-                sweep();
-                updateScore();
-            }
-            dropCounter = 0;
-        }
-        
-        // 玩家硬下落（直接落到底部）
-        function playerHardDrop() {
-            while (!collide()) {
-                player.pos.y++;
-            }
-            player.pos.y--;
-            playerDrop();
-        }
-        
-        // 合并方块到游戏板
-        function merge() {
-            player.matrix.forEach((row, y) => {
-                row.forEach((value, x) => {
-                    if (value !== 0) {
-                        board[y + player.pos.y][x + player.pos.x] = value;
-                    }
-                });
-            });
-        }
-        
-        // 清除完整的行
-        function sweep() {
-            let rowCount = 0;
-            outer: for (let y = ROWS - 1; y > 0; y--) {
-                for (let x = 0; x < COLS; x++) {
-                    if (board[y][x] === 0) {
-                        continue outer;
-                    }
-                }
-                
-                // 移除完整的行
-                const row = board.splice(y, 1)[0].fill(0);
-                board.unshift(row);
-                rowCount++;
-                y++;
-            }
-            
-            if (rowCount > 0) {
-                lines += rowCount;
-                // 添加脉冲动画效果
-                document.getElementById('lines').classList.add('pulse');
-                setTimeout(() => {
-                    document.getElementById('lines').classList.remove('pulse');
-                }, 500);
-            }
-        }
-        
-        // 更新分数
-        function updateScore() {
-            const points = [0, 40, 100, 300, 1200]; // 消除1、2、3、4行的得分
-            const linePoints = points[lines % 10] || 0;
-            score += linePoints * level;
-            
-            // 每清除10行升一级
-            level = Math.floor(lines / 10) + 1;
-            dropInterval = Math.max(100, 1000 - (level - 1) * 100);
-            
-            document.getElementById('score').textContent = score;
-            document.getElementById('level').textContent = level;
-            document.getElementById('lines').textContent = lines;
-            
-            // 添加脉冲动画效果
-            document.getElementById('score').classList.add('pulse');
-            document.getElementById('level').classList.add('pulse');
-            setTimeout(() => {
-                document.getElementById('score').classList.remove('pulse');
-                document.getElementById('level').classList.remove('pulse');
-            }, 500);
-        }
-        
-        // 游戏主循环
-        function gameLoop(time = 0) {
-            const deltaTime = time - lastTime;
-            lastTime = time;
-            
-            dropCounter += deltaTime;
-            if (dropCounter > dropInterval && !paused && !gameOver) {
-                playerDrop();
-            }
-            
-            if (!paused && !gameOver) {
-                draw();
-            }
-            
-            requestAnimationFrame(gameLoop);
-        }
-        
-        // 键盘控制
-        document.addEventListener('keydown', e => {
-            if (gameOver) return;
-            
-            switch (e.keyCode) {
-                case 37: // 左箭头
-                    playerMove(-1);
-                    break;
-                case 39: // 右箭头
-                    playerMove(1);
-                    break;
-                case 40: // 下箭头
-                    playerDrop();
-                    break;
-                case 38: // 上箭头
-                    playerRotate();
-                    break;
-                case 32: // 空格
-                    playerHardDrop();
-                    break;
-                case 80: // P键
-                    togglePause();
-                    break;
-            }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         });
         
-        // 移动端控制
-        document.querySelector('.left').addEventListener('click', () => playerMove(-1));
-        document.querySelector('.right').addEventListener('click', () => playerMove(1));
-        document.querySelector('.down').addEventListener('click', () => playerDrop());
-        document.querySelector('.rotate').addEventListener('click', () => playerRotate());
-        document.querySelector('.drop').addEventListener('click', () => playerHardDrop());
+        // --- 3D 职业网络图 (Three.js) ---
+        const graphContainer = document.getElementById('career-graph-container');
+        let graphScene, graphCamera, graphRenderer, nodes, lines;
         
-        // 暂停游戏
-        function togglePause() {
-            paused = !paused;
-            document.getElementById('pauseBtn').textContent = paused ? '继续游戏' : '暂停游戏';
-            document.getElementById('status').textContent = paused ? '已暂停' : '游戏中';
+        function initCareerGraph() {
+            graphScene = new THREE.Scene();
+            graphCamera = new THREE.PerspectiveCamera(75, graphContainer.clientWidth / graphContainer.clientHeight, 0.1, 1000);
+            graphRenderer = new THREE.WebGLRenderer({ alpha: true });
+            graphRenderer.setSize(graphContainer.clientWidth, graphContainer.clientHeight);
+            graphContainer.appendChild(graphRenderer.domElement);
+
+            const nodeData = [
+                { name: 'Python', type: 'skill' }, { name: '数据分析师', type: 'job' },
+                { name: '机器学习', type: 'skill' }, { name: 'AI工程师', type: 'job' },
+                { name: 'JavaScript', type: 'skill' }, { name: '前端开发', type: 'job' },
+                { name: '云计算', type: 'skill' }, { name: '架构师', type: 'job' },
+                { name: 'Unity', type: 'skill' }, { name: 'VR开发者', type: 'job' },
+                { name: '网络协议', type: 'skill' }, { name: '安全专家', type: 'job' }
+            ];
+
+            nodes = new THREE.Group();
+            nodeData.forEach(d => {
+                const geometry = new THREE.SphereGeometry(d.type === 'job' ? 0.15 : 0.1, 16, 16);
+                const material = new THREE.MeshBasicMaterial({ color: d.type === 'job' ? 0xc084fc : 0x818cf8 });
+                const node = new THREE.Mesh(geometry, material);
+                node.position.set((Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4);
+                
+                // 添加文字标签
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                context.font = "Bold 20px Noto Sans SC";
+                context.fillStyle = "rgba(255,255,255,0.9)";
+                context.fillText(d.name, 0, 20);
+                const texture = new THREE.CanvasTexture(canvas);
+                const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
+                const sprite = new THREE.Sprite(spriteMaterial);
+                sprite.scale.set(1, 0.5, 1.0);
+                node.add(sprite);
+                
+                nodes.add(node);
+            });
+            graphScene.add(nodes);
+            
+            // 创建连接线
+            const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, opacity: 0.2, transparent: true });
+            const points = [];
+            for(let i = 0; i < nodes.children.length; i+=2) {
+                points.push(nodes.children[i].position);
+                points.push(nodes.children[i+1].position);
+            }
+            const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+            lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+            graphScene.add(lines);
+
+            graphCamera.position.z = 5;
+            
+            let isDragging = false;
+            let previousMousePosition = { x: 0, y: 0 };
+            
+            const onMouseDown = (e) => { isDragging = true; };
+            const onMouseUp = (e) => { isDragging = false; };
+            const onMouseMove = (e) => {
+                if (!isDragging) return;
+                const deltaMove = {
+                    x: e.offsetX - previousMousePosition.x,
+                    y: e.offsetY - previousMousePosition.y
+                };
+                
+                nodes.rotation.y += deltaMove.x * 0.005;
+                nodes.rotation.x += deltaMove.y * 0.005;
+                lines.rotation.y += deltaMove.x * 0.005;
+                lines.rotation.x += deltaMove.y * 0.005;
+
+                previousMousePosition = { x: e.offsetX, y: e.offsetY };
+            };
+
+            graphContainer.addEventListener('mousedown', onMouseDown);
+            graphContainer.addEventListener('mouseup', onMouseUp);
+            graphContainer.addEventListener('mousemove', onMouseMove);
+            graphContainer.addEventListener('mouseleave', onMouseUp);
         }
         
-        // 按钮事件监听
-        document.getElementById('pauseBtn').addEventListener('click', togglePause);
-        document.getElementById('resetBtn').addEventListener('click', resetGame);
-        document.getElementById('restartBtn').addEventListener('click', resetGame);
+        function animateGraph() {
+            if(graphScene) {
+                requestAnimationFrame(animateGraph);
+                nodes.rotation.y += 0.0005;
+                lines.rotation.y += 0.0005;
+                graphRenderer.render(graphScene, graphCamera);
+            }
+        }
         
-        // 初始化游戏
-        window.onload = init;
+        // --- 页面交互 ---
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // 导航栏滚动效果
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('bg-black', 'bg-opacity-50', 'backdrop-blur-sm');
+                } else {
+                    navbar.classList.remove('bg-black', 'bg-opacity-50', 'backdrop-blur-sm');
+                }
+            });
+
+            // 移动端菜单切换
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // 元素淡入效果
+            const faders = document.querySelectorAll('.fade-in-up');
+            const appearOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            };
+            const appearOnScroll = new IntersectionObserver(function(entries, appearOnScroll) {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) {
+                        return;
+                    } else {
+                        entry.target.classList.add('visible');
+                        appearOnScroll.unobserve(entry.target);
+                    }
+                });
+            }, appearOptions);
+
+            faders.forEach(fader => {
+                appearOnScroll.observe(fader);
+            });
+            
+            // 延迟加载和启动职业网络图
+            const graphObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        if (!graphScene) { // 防止重复初始化
+                           initCareerGraph();
+                           animateGraph();
+                        }
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            graphObserver.observe(graphContainer);
+            
+            window.addEventListener('resize', () => {
+                if(graphRenderer) {
+                    graphCamera.aspect = graphContainer.clientWidth / graphContainer.clientHeight;
+                    graphCamera.updateProjectionMatrix();
+                    graphRenderer.setSize(graphContainer.clientWidth, graphContainer.clientHeight);
+                }
+            });
+        });
     </script>
 </body>
 </html>
+
