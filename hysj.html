@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海洋珍奇鱼类图鉴</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            overflow: hidden; /* Hide scrollbars initially */
+        }
+        .font-mashan {
+            font-family: 'Ma Shan Zheng', cursive;
+        }
+        /* Underwater background effect */
+        #ocean-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #001f3f, #0074D9, #7FDBFF);
+            background-size: 100% 400%;
+            animation: gradient-animation 20s ease infinite;
+            z-index: -1;
+        }
+        @keyframes gradient-animation {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 0% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+        /* Bubbles animation */
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            bottom: -50px;
+            animation: rise 10s infinite ease-in;
+        }
+        @keyframes rise {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-120vh) scale(1.5);
+                opacity: 0;
+            }
+        }
+        /* Fish card animation */
+        .fish-card {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            animation: float 6s ease-in-out infinite;
+        }
+        .fish-card:hover {
+            transform: translateY(-15px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        /* Custom scrollbar */
+        #main-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        #main-content::-webkit-scrollbar-track {
+            background: rgba(0, 116, 217, 0.3);
+            border-radius: 10px;
+        }
+        #main-content::-webkit-scrollbar-thumb {
+            background: rgba(127, 219, 255, 0.8);
+            border-radius: 10px;
+        }
+        #main-content::-webkit-scrollbar-thumb:hover {
+            background: #7FDBFF;
+        }
+    </style>
+</head>
+<body class="bg-blue-900 text-white">
+
+    <!-- Ocean Background Container -->
+    <div id="ocean-background"></div>
+    <div id="bubbles-container"></div>
+
+    <!-- Landing/Entry Section -->
+    <div id="landing-screen" class="fixed inset-0 flex flex-col items-center justify-center transition-opacity duration-1000 ease-in-out z-20 bg-black bg-opacity-30">
+        <h1 class="font-mashan text-6xl md:text-8xl text-white drop-shadow-lg mb-4">潜入深蓝</h1>
+        <p class="text-xl md:text-2xl text-gray-200 mb-8">探索海洋深处的奥秘</p>
+        <button id="enter-button" class="bg-cyan-400 text-blue-900 font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:bg-cyan-300 transition-all duration-300 transform hover:scale-110">
+            进入海洋世界
+        </button>
+    </div>
+
+    <!-- Main Content Section -->
+    <main id="main-content" class="container mx-auto px-4 py-8 opacity-0 transition-opacity duration-1000 ease-in-out hidden overflow-y-auto h-screen">
+        <header class="text-center mb-12">
+            <h1 class="font-mashan text-5xl md:text-7xl font-bold tracking-wider">珍奇鱼类图鉴</h1>
+            <p class="text-lg text-gray-300 mt-2">点击下方分类进行探索</p>
+        </header>
+
+        <!-- Filter Buttons -->
+        <div id="filter-container" class="flex flex-wrap justify-center gap-3 mb-12">
+            <button class="filter-btn bg-white/20 backdrop-blur-sm py-2 px-5 rounded-full hover:bg-white/40 transition" data-category="all">全部</button>
+            <button class="filter-btn bg-white/10 backdrop-blur-sm py-2 px-5 rounded-full hover:bg-white/40 transition" data-category="珊瑚礁鱼类">珊瑚礁鱼类</button>
+            <button class="filter-btn bg-white/10 backdrop-blur-sm py-2 px-5 rounded-full hover:bg-white/40 transition" data-category="深海鱼类">深海鱼类</button>
+            <button class="filter-btn bg-white/10 backdrop-blur-sm py-2 px-5 rounded-full hover:bg-white/40 transition" data-category="大型海洋生物">大型海洋生物</button>
+        </div>
+
+        <!-- Fish Grid -->
+        <div id="fish-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            <!-- Fish cards will be injected here by JavaScript -->
+        </div>
+
+        <footer class="text-center mt-16 pb-8">
+            <p class="text-gray-400">© 2025 海洋探索者</p>
+        </footer>
+    </main>
+    
+    <!-- Mute Button -->
+    <button id="mute-button" class="fixed bottom-5 right-5 bg-white/20 backdrop-blur-sm p-3 rounded-full text-white hover:bg-white/40 transition z-30">
+        <svg id="volume-on-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+        <svg id="volume-off-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+    </button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DATA ---
+            // This is a sample of 20 fish. This structure can be expanded to 100.
+            const fishData = [
+                { name: 'Clownfish', chineseName: '小丑鱼', category: '珊瑚礁鱼类', description: '与海葵共生，色彩鲜艳，是海洋中最具辨识度的鱼类之一。', imageUrl: 'https://placehold.co/400x300/f39c12/white?text=小丑鱼' },
+                { name: 'Mandarinfish', chineseName: '麒麟鱼', category: '珊瑚礁鱼类', description: '因其迷幻般的色彩和图案而闻名，被认为是世界上最美丽的鱼。', imageUrl: 'https://placehold.co/400x300/3498db/white?text=麒麟鱼' },
+                { name: 'Regal Tang', chineseName: '蓝倒吊', category: '珊瑚礁鱼类', description: '鲜艳的蓝色身体和黄色尾巴，因电影《海底总动员》而广为人知。', imageUrl: 'https://placehold.co/400x300/2980b9/white?text=蓝倒吊' },
+                { name: 'Lionfish', chineseName: '狮子鱼', category: '珊瑚礁鱼类', description: '拥有引人注目的条纹和剧毒的鳍棘，是优雅而危险的掠食者。', imageUrl: 'https://placehold.co/400x300/c0392b/white?text=狮子鱼' },
+                { name: 'Emperor Angelfish', chineseName: '皇帝神仙鱼', category: '珊瑚礁鱼类', description: '体色华丽，幼鱼和成鱼的图案截然不同，极具观赏价值。', imageUrl: 'https://placehold.co/400x300/f1c40f/white?text=皇帝神仙鱼' },
+                { name: 'Butterflyfish', chineseName: '蝴蝶鱼', category: '珊瑚礁鱼类', description: '体态轻盈，色彩斑斓，常成对活动于珊瑚丛中。', imageUrl: 'https://placehold.co/400x300/e67e22/white?text=蝴蝶鱼' },
+                { name: 'Seahorse', chineseName: '海马', category: '珊瑚礁鱼类', description: '形态奇特，由雄性负责孵育后代，是海洋中的“模范父亲”。', imageUrl: 'https://placehold.co/400x300/2ecc71/white?text=海马' },
+                { name: 'Parrotfish', chineseName: '鹦嘴鱼', category: '珊瑚礁鱼类', description: '用其鹦鹉般的喙啃食珊瑚，是珊瑚礁生态系统的重要维护者。', imageUrl: 'https://placehold.co/400x300/1abc9c/white?text=鹦嘴鱼' },
+                { name: 'Anglerfish', chineseName: '琵琶鱼', category: '深海鱼类', description: '深海的潜伏猎手，用头顶的发光“钓竿”来引诱猎物。', imageUrl: 'https://placehold.co/400x300/34495e/white?text=琵琶鱼' },
+                { name: 'Viperfish', chineseName: '蝰蛇鱼', category: '深海鱼类', description: '拥有不成比例的巨大牙齿和发光器官，是深海中的凶猛捕食者。', imageUrl: 'https://placehold.co/400x300/2c3e50/white?text=蝰蛇鱼' },
+                { name: 'Goblin Shark', chineseName: '哥布林鲨', category: '深海鱼类', description: '被称为“活化石”，拥有可伸缩的下颚，捕食方式十分独特。', imageUrl: 'https://placehold.co/400x300/95a5a6/white?text=哥布林鲨' },
+                { name: 'Barreleye Fish', chineseName: '管眼鱼', category: '深海鱼类', description: '拥有透明的头部和可以向上看的管状眼睛，以适应深海的微光环境。', imageUrl: 'https://placehold.co/400x300/7f8c8d/white?text=管眼鱼' },
+                { name: 'Whale Shark', chineseName: '鲸鲨', category: '大型海洋生物', description: '海洋中最大的鱼类，性格温和，以浮游生物为食的滤食者。', imageUrl: 'https://placehold.co/400x300/5d6d7e/white?text=鲸鲨' },
+                { name: 'Manta Ray', chineseName: '蝠鲼', category: '大型海洋生物', description: '优雅的“海洋飞毯”，拥有巨大的翼展，在水中翩翩起舞。', imageUrl: 'https://placehold.co/400x300/8e44ad/white?text=蝠鲼' },
+                { name: 'Great White Shark', chineseName: '大白鲨', category: '大型海洋生物', description: '海洋顶级的掠食者，以其强大的力量和高效的捕食技巧而闻名。', imageUrl: 'https://placehold.co/400x300/bdc3c7/white?text=大白鲨' },
+                { name: 'Humpback Whale', chineseName: '座头鲸', category: '大型海洋生物', description: '以其动人的歌声和壮观的跃水动作而著称的海洋巨兽。', imageUrl: 'https://placehold.co/400x300/16a085/white?text=座头鲸' },
+                { name: 'Discus Fish', chineseName: '七彩神仙鱼', category: '珊瑚礁鱼类', description: '体形圆盘状，色彩变幻无穷，被誉为“热带鱼之王”。', imageUrl: 'https://placehold.co/400x300/d35400/white?text=七彩神仙鱼' },
+                { name: 'Moorish Idol', chineseName: '镰鱼', category: '珊瑚礁鱼类', description: '黑、白、黄三色相间，拥有极长的背鳍，姿态高雅。', imageUrl: 'https://placehold.co/400x300/ecf0f1/black?text=镰鱼' },
+                { name: 'Leafy Seadragon', chineseName: '叶海龙', category: '珊瑚礁鱼类', description: '伪装大师，全身长满叶状突出物，完美融入海草环境。', imageUrl: 'https://placehold.co/400x300/27ae60/white?text=叶海龙' },
+                { name: 'Banggai Cardinalfish', chineseName: '邦盖红衣主教鱼', category: '珊瑚礁鱼类', description: '优雅的黑白条纹和斑点，是濒危的珍稀鱼种。', imageUrl: 'https://placehold.co/400x300/9b59b6/white?text=邦盖红衣主教鱼' },
+            ];
+
+            // --- ELEMENTS ---
+            const landingScreen = document.getElementById('landing-screen');
+            const enterButton = document.getElementById('enter-button');
+            const mainContent = document.getElementById('main-content');
+            const fishGrid = document.getElementById('fish-grid');
+            const filterContainer = document.getElementById('filter-container');
+            const bubblesContainer = document.getElementById('bubbles-container');
+            const muteButton = document.getElementById('mute-button');
+            const volumeOnIcon = document.getElementById('volume-on-icon');
+            const volumeOffIcon = document.getElementById('volume-off-icon');
+
+            // --- AUDIO ---
+            let isMuted = false;
+            const ambientPlayer = new Tone.Player({
+                url: "https://tonejs.github.io/audio/berceuse.mp3", // Using a placeholder for underwater sounds
+                loop: true,
+                autostart: false,
+                volume: -15, // Lower volume for background effect
+            }).toDestination();
+            
+            const noise = new Tone.Noise("pink").start();
+            const filter = new Tone.AutoFilter({
+                frequency: "8n",
+                baseFrequency: 200,
+                octaves: 3
+            }).toDestination().start();
+            noise.connect(filter);
+            noise.volume.value = -30;
+            
+            // --- FUNCTIONS ---
+            function createFishCard(fish) {
+                const card = document.createElement('div');
+                card.className = 'fish-card bg-black/30 backdrop-blur-md rounded-lg overflow-hidden shadow-lg cursor-pointer';
+                card.innerHTML = `
+                    <div class="relative">
+                        <img src="${fish.imageUrl}" alt="${fish.name}" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/400x300/3498db/ffffff?text=Image+Not+Found';">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                        <h3 class="absolute bottom-2 left-4 text-2xl font-bold">${fish.chineseName}</h3>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-300 text-sm">${fish.description}</p>
+                    </div>
+                `;
+                return card;
+            }
+
+            function renderFish(category = 'all') {
+                fishGrid.innerHTML = '';
+                const filteredFish = category === 'all' 
+                    ? fishData 
+                    : fishData.filter(fish => fish.category === category);
+                
+                filteredFish.forEach(fish => {
+                    const card = createFishCard(fish);
+                    fishGrid.appendChild(card);
+                });
+            }
+
+            function createBubble() {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                const size = Math.random() * 40 + 10 + 'px';
+                bubble.style.width = size;
+                bubble.style.height = size;
+                bubble.style.left = Math.random() * 100 + 'vw';
+                bubble.style.animationDuration = Math.random() * 5 + 8 + 's';
+                bubble.style.animationDelay = Math.random() * 5 + 's';
+                bubblesContainer.appendChild(bubble);
+
+                setTimeout(() => {
+                    bubble.remove();
+                }, 13000);
+            }
+            
+            // --- EVENT LISTENERS ---
+            enterButton.addEventListener('click', () => {
+                Tone.start();
+                if (!isMuted) {
+                    ambientPlayer.start();
+                    noise.volume.value = -30;
+                }
+                landingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    landingScreen.style.display = 'none';
+                    mainContent.style.display = 'block';
+                    document.body.style.overflow = 'auto';
+                    setTimeout(() => {
+                        mainContent.style.opacity = '1';
+                    }, 50);
+                }, 1000);
+            });
+
+            filterContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('filter-btn')) {
+                    const category = e.target.dataset.category;
+                    renderFish(category);
+                    
+                    // Update active button style
+                    document.querySelectorAll('.filter-btn').forEach(btn => {
+                        btn.classList.remove('bg-white/40');
+                        btn.classList.add('bg-white/10');
+                    });
+                    e.target.classList.remove('bg-white/10');
+                    e.target.classList.add('bg-white/40');
+                }
+            });
+
+            muteButton.addEventListener('click', () => {
+                isMuted = !isMuted;
+                if (isMuted) {
+                    ambientPlayer.stop();
+                    noise.volume.value = -Infinity;
+                    volumeOnIcon.classList.add('hidden');
+                    volumeOffIcon.classList.remove('hidden');
+                } else {
+                    if(Tone.context.state === 'running') {
+                       ambientPlayer.start();
+                       noise.volume.value = -30;
+                    }
+                    volumeOnIcon.classList.remove('hidden');
+                    volumeOffIcon.classList.add('hidden');
+                }
+            });
+
+            // --- INITIALIZATION ---
+            renderFish(); // Initial render of all fish
+            setInterval(createBubble, 500); // Create bubbles periodically
+        });
+    </script>
+</body>
+</html>
