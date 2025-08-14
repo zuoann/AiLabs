@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小学三年级英语乐园</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 2.5em;
+            color: #4a90e2;
+            margin-bottom: 10px;
+            animation: bounce 2s infinite;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* 学习模块网格 */
+        .learning-modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .module {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module:hover {
+            transform: translateY(-10px) scale(1.05);
+            border-color: #ff6b6b;
+            box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4);
+        }
+
+        .module::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, rgba(255, 107, 107, 0.1), transparent);
+            animation: rotate 4s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .module-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .module h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.4em;
+        }
+
+        .module p {
+            color: #666;
+            font-size: 1em;
+            line-height: 1.4;
+        }
+
+        /* 互动区域 */
+        .interactive-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+
+        .word-game {
+            text-align: center;
+        }
+
+        .word-display {
+            font-size: 3em;
+            color: #4a90e2;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(45deg, #ffeaa7, #fab1a0);
+            border-radius: 15px;
+            display: inline-block;
+            min-width: 200px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #ffeaa7, #fab1a0);
+            color: #333;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #00b894, #00cec9);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* 进度条 */
+        .progress-container {
+            margin: 20px 0;
+            background: #e0e0e0;
+            border-radius: 25px;
+            height: 25px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(45deg, #00b894, #00cec9);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* 字母学习区 */
+        .alphabet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .letter-card {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .letter-card:hover {
+            transform: rotate(10deg) scale(1.1);
+            box-shadow: 0 8px 25px rgba(116, 185, 255, 0.6);
+        }
+
+        .letter-card:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transition: all 0.5s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .letter-card:hover:before {
+            width: 100px;
+            height: 100px;
+        }
+
+        /* 奖励系统 */
+        .rewards {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .star {
+            display: inline-block;
+            font-size: 2em;
+            color: #ffd700;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .star.earned {
+            animation: starTwinkle 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes starTwinkle {
+            from { transform: scale(1) rotate(0deg); }
+            to { transform: scale(1.2) rotate(18deg); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .logo {
+                font-size: 2em;
+            }
+            
+            .word-display {
+                font-size: 2em;
+                min-width: 150px;
+            }
+            
+            .control-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 200px;
+            }
+        }
+
+        /* 音效可视化 */
+        .sound-wave {
+            display: inline-block;
+            margin-left: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sound-wave.active {
+            opacity: 1;
+        }
+
+        .sound-wave span {
+            display: inline-block;
+            width: 3px;
+            height: 15px;
+            background: #4a90e2;
+            margin: 0 1px;
+            animation: soundWave 1s ease-in-out infinite;
+        }
+
+        .sound-wave span:nth-child(2) { animation-delay: 0.1s; }
+        .sound-wave span:nth-child(3) { animation-delay: 0.2s; }
+        .sound-wave span:nth-child(4) { animation-delay: 0.3s; }
+
+        @keyframes soundWave {
+            0%, 100% { height: 15px; }
+            50% { height: 5px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🌟 英语乐园 English Wonderland 🌟</div>
+            <div class="subtitle">小学三年级上册 • 快乐学英语</div>
+        </div>
+
+        <div class="learning-modules">
+            <div class="module" onclick="showAlphabetLearning()">
+                <span class="module-icon">🔤</span>
+                <h3>字母认知</h3>
+                <p>学习26个英文字母的发音和书写，建立英语基础</p>
+            </div>
+
+            <div class="module" onclick="showWordLearning()">
+                <span class="module-icon">📖</span>
+                <h3>单词学习</h3>
+                <p>学习日常生活中的基础英语单词，配有图片和发音</p>
+            </div>
+
+            <div class="module" onclick="showGreetingLearning()">
+                <span class="module-icon">👋</span>
+                <h3>打招呼</h3>
+                <p>学会基本的问候语和自我介绍，培养交际能力</p>
+            </div>
+
+            <div class="module" onclick="showNumberLearning()">
+                <span class="module-icon">🔢</span>
+                <h3>数字游戏</h3>
+                <p>通过有趣的游戏学习1-20的英文数字</p>
+            </div>
+
+            <div class="module" onclick="showColorLearning()">
+                <span class="module-icon">🎨</span>
+                <h3>颜色世界</h3>
+                <p>认识各种颜色的英文表达，感受色彩之美</p>
+            </div>
+
+            <div class="module" onclick="showSongLearning()">
+                <span class="module-icon">🎵</span>
+                <h3>英语儿歌</h3>
+                <p>通过朗朗上口的儿歌，轻松记住英语表达</p>
+            </div>
+        </div>
+
+        <div class="interactive-section" id="learningArea">
+            <div class="word-game">
+                <h2>🎯 今天的学习任务</h2>
+                <div class="word-display" id="wordDisplay">Hello!</div>
+                <div class="sound-wave" id="soundWave">
+                    <span></span><span></span><span></span><span></span>
+                </div>
+                
+                <div class="control-buttons">
+                    <button class="btn btn-primary" onclick="playCurrentSound()">🔊 听发音</button>
+                    <button class="btn btn-secondary" onclick="nextWord()">📚 下一个</button>
+                    <button class="btn btn-success" onclick="showMeaning()">💡 看意思</button>
+                </div>
+
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar">学习进度: 0%</div>
+                </div>
+
+                <div class="rewards">
+                    <div style="margin-bottom: 10px;">今日获得的星星：</div>
+                    <span class="star" id="star1">⭐</span>
+                    <span class="star" id="star2">⭐</span>
+                    <span class="star" id="star3">⭐</span>
+                    <span class="star" id="star4">⭐</span>
+                    <span class="star" id="star5">⭐</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="interactive-section" id="alphabetSection" style="display:none;">
+            <h2>🔤 字母学习园地</h2>
+            <div class="alphabet-grid" id="alphabetGrid">
+                <!-- 字母卡片将通过JavaScript生成 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 学习数据
+        const learningData = {
+            basic: [
+                { word: "Hello", meaning: "你好", category: "greeting" },
+                { word: "Good morning", meaning: "早上好", category: "greeting" },
+                { word: "Thank you", meaning: "谢谢", category: "polite" },
+                { word: "Apple", meaning: "苹果", category: "fruit" },
+                { word: "Cat", meaning: "猫", category: "animal" },
+                { word: "Dog", meaning: "狗", category: "animal" },
+                { word: "Red", meaning: "红色", category: "color" },
+                { word: "Blue", meaning: "蓝色", category: "color" },
+                { word: "One", meaning: "一", category: "number" },
+                { word: "Two", meaning: "二", category: "number" }
+            ],
+            greetings: [
+                { word: "Hello", meaning: "你好" },
+                { word: "Hi", meaning: "嗨" },
+                { word: "Good morning", meaning: "早上好" },
+                { word: "Good afternoon", meaning: "下午好" },
+                { word: "Good evening", meaning: "晚上好" },
+                { word: "Goodbye", meaning: "再见" },
+                { word: "See you", meaning: "再见" },
+                { word: "Thank you", meaning: "谢谢你" },
+                { word: "Please", meaning: "请" },
+                { word: "Sorry", meaning: "对不起" }
+            ],
+            numbers: [
+                { word: "One", meaning: "一" },
+                { word: "Two", meaning: "二" },
+                { word: "Three", meaning: "三" },
+                { word: "Four", meaning: "四" },
+                { word: "Five", meaning: "五" },
+                { word: "Six", meaning: "六" },
+                { word: "Seven", meaning: "七" },
+                { word: "Eight", meaning: "八" },
+                { word: "Nine", meaning: "九" },
+                { word: "Ten", meaning: "十" }
+            ],
+            colors: [
+                { word: "Red", meaning: "红色" },
+                { word: "Blue", meaning: "蓝色" },
+                { word: "Yellow", meaning: "黄色" },
+                { word: "Green", meaning: "绿色" },
+                { word: "Orange", meaning: "橙色" },
+                { word: "Purple", meaning: "紫色" },
+                { word: "Pink", meaning: "粉色" },
+                { word: "Black", meaning: "黑色" },
+                { word: "White", meaning: "白色" },
+                { word: "Brown", meaning: "棕色" }
+            ]
+        };
+
+        let currentWords = learningData.basic;
+        let currentIndex = 0;
+        let progress = 0;
+        let starsEarned = 0;
+
+        // 初始化
+        function init() {
+            updateDisplay();
+            generateAlphabetGrid();
+        }
+
+        // 更新显示
+        function updateDisplay() {
+            const wordDisplay = document.getElementById('wordDisplay');
+            if (currentWords[currentIndex]) {
+                wordDisplay.textContent = currentWords[currentIndex].word;
+            }
+        }
+
+        // 播放发音（模拟）
+        function playCurrentSound() {
+            const soundWave = document.getElementById('soundWave');
+            soundWave.classList.add('active');
+            
+            // 模拟发音效果
+            setTimeout(() => {
+                soundWave.classList.remove('active');
+            }, 1000);
+
+            // 添加成功反馈
+            showSuccessMessage("🔊 正在播放发音...");
+        }
+
+        // 下一个单词
+        function nextWord() {
+            currentIndex = (currentIndex + 1) % currentWords.length;
+            updateDisplay();
+            updateProgress();
+        }
+
+        // 显示意思
+        function showMeaning() {
+            const wordDisplay = document.getElementById('wordDisplay');
+            const currentWord = currentWords[currentIndex];
+            if (currentWord) {
+                wordDisplay.innerHTML = `${currentWord.word}<br><small style="color: #666; font-size: 0.6em;">${currentWord.meaning}</small>`;
+                addStar();
+                setTimeout(() => {
+                    wordDisplay.textContent = currentWord.word;
+                }, 3000);
+            }
+        }
+
+        // 更新进度
+        function updateProgress() {
+            progress = Math.min(100, progress + 10);
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = `学习进度: ${progress}%`;
+        }
+
+        // 添加星星奖励
+        function addStar() {
+            if (starsEarned < 5) {
+                starsEarned++;
+                const star = document.getElementById(`star${starsEarned}`);
+                star.classList.add('earned');
+                showSuccessMessage(`🌟 获得了第${starsEarned}颗星星！`);
+            }
+        }
+
+        // 显示成功消息
+        function showSuccessMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = message;
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(45deg, #00b894, #00cec9);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 25px;
+                font-weight: bold;
+                z-index: 1000;
+                animation: slideIn 0.5s ease;
+            `;
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+        }
+
+        // 学习模块切换函数
+        function showWordLearning() {
+            currentWords = learningData.basic;
+            currentIndex = 0;
+            updateDisplay();
+            showSuccessMessage("📖 进入单词学习模式！");
+        }
+
+        function showGreetingLearning() {
+            currentWords = learningData.greetings;
+            currentIndex = 0;
+            updateDisplay();
+            showSuccessMessage("👋 开始学习打招呼！");
+        }
+
+        function showNumberLearning() {
+            currentWords = learningData.numbers;
+            currentIndex = 0;
+            updateDisplay();
+            showSuccessMessage("🔢 数字学习开始啦！");
+        }
+
+        function showColorLearning() {
+            currentWords = learningData.colors;
+            currentIndex = 0;
+            updateDisplay();
+            showSuccessMessage("🎨 进入颜色世界！");
+        }
+
+        function showAlphabetLearning() {
+            document.getElementById('learningArea').style.display = 'none';
+            document.getElementById('alphabetSection').style.display = 'block';
+            showSuccessMessage("🔤 开始学习字母！");
+        }
+
+        function showSongLearning() {
+            showSuccessMessage("🎵 英语儿歌功能即将开放！");
+        }
+
+        // 生成字母网格
+        function generateAlphabetGrid() {
+            const alphabetGrid = document.getElementById('alphabetGrid');
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+            
+            letters.forEach(letter => {
+                const letterCard = document.createElement('div');
+                letterCard.className = 'letter-card';
+                letterCard.textContent = letter;
+                letterCard.onclick = () => {
+                    playLetterSound(letter);
+                    letterCard.style.animation = 'none';
+                    letterCard.offsetHeight; // 触发重排
+                    letterCard.style.animation = 'bounce 0.6s ease';
+                };
+                alphabetGrid.appendChild(letterCard);
+            });
+        }
+
+        // 播放字母发音（模拟）
+        function playLetterSound(letter) {
+            showSuccessMessage(`🔊 字母 ${letter} 的发音！`);
+        }
+
+        // 添加CSS动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 初始化页面
+        init();
+    </script>
+</body>
+</html>
