@@ -8,6 +8,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- FIX: Load Three.js and OrbitControls globally -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
         :root {
             --glow-color: #00f6ff;
@@ -106,12 +109,8 @@
         </div>
     </div>
     
-    <!-- Main application script using ES6 Modules -->
-    <script type="module">
-        // Import Three.js and OrbitControls from a module-compatible CDN
-        import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.140.0/build/three.module.js';
-        import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.140.0/examples/jsm/controls/OrbitControls.js';
-
+    <!-- Main application script -->
+    <script>
         // --- DATA SOURCE ---
         const tankData = [
             { id: 1, name: "虎式 I 型", country: "德国", params: { "主炮": "88mm KwK 36", "装甲": "120mm", "速度": "45 km/h", "重量": "57吨" }, funFact: "一辆“虎式”坦克的造价可以制造出三辆“黑豹”或四辆“四号”坦克。其复杂的“交错式负重轮”虽然提供了极佳的稳定性，但在东线的泥泞和严寒中却是个噩梦。", modelConfig: { chassis: [1.5, 0.7, 1], turretType: 'box', turret: [0.6, 0.4, 0.6], barrel: [1.2, 0.08], color: '#8B857A' } },
@@ -282,7 +281,7 @@
             modalRenderer.setSize(container.clientWidth, container.clientHeight);
             modalRenderer.setPixelRatio(window.devicePixelRatio);
             container.appendChild(modalRenderer.domElement);
-            modalControls = new OrbitControls(modalCamera, modalRenderer.domElement);
+            modalControls = new THREE.OrbitControls(modalCamera, modalRenderer.domElement);
             modalControls.enableDamping = true;
             modalControls.minDistance = 2;
             modalControls.maxDistance = 10;
