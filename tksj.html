@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>世界坦克鉴赏库</title>
+    <title>世界坦克鉴赏库 (3D版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,23 +11,35 @@
     <style>
         :root {
             --glow-color: #00f6ff;
+            --glow-color-hover: #99feff;
         }
         body {
             font-family: 'Noto Sans SC', sans-serif;
             background-color: #0a0a1a;
             color: #e0e0e0;
             overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(0, 246, 255, 0.08) 0%, transparent 30%),
+                radial-gradient(circle at 75% 75%, rgba(0, 246, 255, 0.06) 0%, transparent 30%);
+            background-size: 150px 150px;
+            animation: move-background 25s linear infinite;
         }
-        .font-orbitron {
-            font-family: 'Orbitron', sans-serif;
+        @keyframes move-background {
+            0% { background-position: 0 0; }
+            100% { background-position: 150px 150px; }
         }
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
         .card-glow {
-            box-shadow: 0 0 5px rgba(0, 246, 255, 0.3), 0 0 10px rgba(0, 246, 255, 0.2), inset 0 0 8px rgba(0, 246, 255, 0.2);
+            border: 1px solid rgba(0, 246, 255, 0.1);
+            background: rgba(15, 23, 42, 0.5); /* bg-slate-900/50 */
+            backdrop-filter: blur(4px);
+            box-shadow: 0 0 5px rgba(0, 246, 255, 0.2), inset 0 0 8px rgba(0, 246, 255, 0.1);
             transition: all 0.3s ease-in-out;
         }
         .card-glow:hover {
             transform: translateY(-5px) scale(1.03);
-            box-shadow: 0 0 15px rgba(0, 246, 255, 0.6), 0 0 25px rgba(0, 246, 255, 0.4), inset 0 0 10px rgba(0, 246, 255, 0.3);
+            border-color: rgba(0, 246, 255, 0.4);
+            box-shadow: 0 0 15px rgba(0, 246, 255, 0.4), 0 0 25px rgba(0, 246, 255, 0.2), inset 0 0 10px rgba(0, 246, 255, 0.2);
         }
         .modal-backdrop {
             background-color: rgba(10, 10, 30, 0.8);
@@ -36,423 +48,319 @@
         .modal-content {
             background: radial-gradient(circle at 50% 50%, #1a1a3a, #0a0a1a);
             border: 1px solid var(--glow-color);
-            box-shadow: 0 0 25px var(--glow-color);
+            box-shadow: 0 0 35px rgba(0, 246, 255, 0.5);
         }
         .tech-border {
             border: 1px solid rgba(0, 246, 255, 0.3);
             position: relative;
         }
         .tech-border::before, .tech-border::after {
-            content: '';
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            border-color: var(--glow-color);
-            border-style: solid;
+            content: ''; position: absolute; width: 12px; height: 12px;
+            border-color: var(--glow-color); border-style: solid;
         }
-        .tech-border::before {
-            top: -2px;
-            left: -2px;
-            border-width: 2px 0 0 2px;
-        }
-        .tech-border::after {
-            bottom: -2px;
-            right: -2px;
-            border-width: 0 2px 2px 0;
-        }
-        .svg-scanline {
-            animation: scan 4s linear infinite;
-        }
-        @keyframes scan {
-            0% { transform: translateY(-10%); }
-            50% { transform: translateY(110%); }
-            50.01% { opacity: 0; }
-            50.02% { transform: translateY(-10%); opacity: 1; }
-            100% { transform: translateY(110%); }
-        }
-        /* Scrollbar styling */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0a0a1a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--glow-color);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #00c4cc;
-        }
+        .tech-border::before { top: -2px; left: -2px; border-width: 2px 0 0 2px; }
+        .tech-border::after { bottom: -2px; right: -2px; border-width: 0 2px 2px 0; }
+        #modal-3d-container canvas { display: block; width: 100%; height: 100%; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a1a; }
+        ::-webkit-scrollbar-thumb { background: var(--glow-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00c4cc; }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200">
 
     <!-- Header -->
-    <header class="text-center py-8 px-4 bg-black bg-opacity-30">
+    <header class="text-center py-8 px-4 bg-black bg-opacity-30 relative z-10">
         <h1 class="font-orbitron text-4xl md:text-6xl font-bold text-white tracking-widest" style="text-shadow: 0 0 10px var(--glow-color), 0 0 20px var(--glow-color);">
-            世界坦克鉴赏库
+            世界坦克鉴赏库 3D
         </h1>
-        <p class="mt-2 text-lg text-cyan-300">探索超过100种传奇战车的奥秘</p>
+        <p class="mt-2 text-lg text-cyan-300">全方位探索超过100种传奇战车</p>
     </header>
 
     <!-- Tank Grid -->
-    <main id="tank-grid" class="container mx-auto p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-        <!-- Tank cards will be injected here by JavaScript -->
+    <main id="tank-grid" class="container mx-auto p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6 relative z-10">
+        <!-- Tank cards will be injected here -->
     </main>
     
     <!-- Footer -->
-    <footer class="text-center py-6 mt-8 text-sm text-gray-500">
+    <footer class="text-center py-6 mt-8 text-sm text-gray-500 relative z-10">
         <p>为军事爱好者与未来工程师打造的互动百科</p>
     </footer>
 
     <!-- Modal for Tank Details -->
     <div id="tank-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden modal-backdrop">
-        <div id="modal-content" class="modal-content w-full max-w-4xl max-h-[90vh] rounded-lg overflow-hidden flex flex-col md:flex-row tech-border">
-            <!-- Left Side: SVG Animation -->
-            <div class="w-full md:w-1/2 p-6 flex items-center justify-center relative overflow-hidden bg-black bg-opacity-20">
-                <div id="svg-container" class="w-full h-full">
-                    <!-- SVG will be injected here -->
-                </div>
-                <!-- Scanline effect -->
-                <div class="absolute top-0 left-0 w-full h-full pointer-events-none">
-                    <div class="w-full h-full bg-repeat" style="background-image: linear-gradient(rgba(10,10,30,0), rgba(10,10,30,0.1) 50%, rgba(10,10,30,0)); background-size: 100% 4px;"></div>
-                    <div class="svg-scanline absolute top-0 left-0 w-full h-1 bg-cyan-300 opacity-70"></div>
-                </div>
+        <div id="modal-content" class="modal-content w-full max-w-5xl max-h-[90vh] rounded-lg overflow-hidden flex flex-col md:flex-row tech-border">
+            <!-- Left Side: 3D Animation -->
+            <div id="modal-3d-container" class="w-full md:w-3/5 h-64 md:h-auto bg-black bg-opacity-20 cursor-grab active:cursor-grabbing">
+                <!-- 3D Canvas will be injected here -->
             </div>
 
             <!-- Right Side: Details -->
-            <div class="w-full md:w-1/2 p-6 overflow-y-auto">
+            <div class="w-full md:w-2/5 p-6 overflow-y-auto">
                 <h2 id="modal-tank-name" class="font-orbitron text-3xl font-bold text-white mb-4" style="text-shadow: 0 0 5px var(--glow-color);"></h2>
-                
                 <div class="mb-6">
                     <h3 class="font-bold text-xl text-cyan-300 border-b-2 border-cyan-500/30 pb-1 mb-2">主要作战参数</h3>
-                    <ul id="modal-tank-params" class="space-y-1 text-base">
-                        <!-- Parameters will be injected here -->
-                    </ul>
+                    <ul id="modal-tank-params" class="space-y-2 text-base"></ul>
                 </div>
-
                 <div>
                     <h3 class="font-bold text-xl text-cyan-300 border-b-2 border-cyan-500/30 pb-1 mb-2">趣味冷知识</h3>
                     <p id="modal-tank-fun-fact" class="text-lg leading-relaxed bg-black bg-opacity-20 p-3 rounded-md border-l-4 border-cyan-400"></p>
                 </div>
             </div>
             
-            <button id="close-modal" class="absolute top-3 right-3 text-white text-3xl hover:text-cyan-300 transition-colors">&times;</button>
+            <button id="close-modal" class="absolute top-3 right-3 text-white text-3xl hover:text-cyan-300 transition-colors z-20">&times;</button>
         </div>
     </div>
 
+    <!-- Three.js Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
     <script>
-        // --- DATA SOURCE ---
-        // This is the core data for all 100 tanks.
-        // For demonstration, the first 10 have detailed, unique data.
-        // The rest are programmatically generated to meet the 100-tank requirement.
+        // --- DATA SOURCE (Updated with realistic colors) ---
         const tankData = [
-            // 1. Tiger I (Germany)
-            {
-                id: 1,
-                name: "虎式 I 型",
-                country: "德国",
-                params: { "主炮": "88mm KwK 36", "装甲": "120mm", "速度": "45 km/h", "重量": "57吨" },
-                funFact: "一辆“虎式”坦克的造价可以制造出三辆“黑豹”或四辆“四号”坦克。其复杂的“交错式负重轮”虽然提供了极佳的稳定性，但在东线的泥泞和严寒中却是个噩梦，常常被冻住或塞满泥土。",
-                svgConfig: { chassisW: 150, chassisH: 70, turretType: 'box', turretW: 60, turretH: 40, barrelL: 100, barrelW: 8, color: '#a09a8e' }
-            },
-            // 2. T-34/85 (USSR)
-            {
-                id: 2,
-                name: "T-34/85",
-                country: "苏联",
-                params: { "主炮": "85mm ZIS-S-53", "装甲": "90mm (倾斜)", "速度": "55 km/h", "重量": "32吨" },
-                funFact: "T-34的“倾斜装甲”设计是革命性的，它能有效地弹开炮弹，用更薄的钢板达到了更强的防护效果。它被认为是二战中最具综合优势的坦克，简单、廉价且高效。",
-                svgConfig: { chassisW: 140, chassisH: 60, turretType: 'round', turretW: 65, turretH: 45, barrelL: 90, barrelW: 7, color: '#6b7a60' }
-            },
-            // 3. M4 Sherman (USA)
-            {
-                id: 3,
-                name: "M4 谢尔曼",
-                country: "美国",
-                params: { "主炮": "75mm M3", "装甲": "76mm", "速度": "48 km/h", "重量": "30吨" },
-                funFact: "谢尔曼坦克的外号是“朗森打火机”，因为其早期型号使用的汽油发动机在被击中后容易起火。但它真正的优势在于惊人的产量和可靠性，总产量接近5万辆。",
-                svgConfig: { chassisW: 130, chassisH: 75, turretType: 'round', turretW: 55, turretH: 40, barrelL: 70, barrelW: 6, color: '#797b6a' }
-            },
-            // 4. Leopard 2A7 (Germany)
-            {
-                id: 4,
-                name: "豹 2A7",
-                country: "德国",
-                params: { "主炮": "120mm L/55 滑膛炮", "装甲": "复合装甲", "速度": "72 km/h", "重量": "67吨" },
-                funFact: "在一次国际坦克比赛中，豹2坦克曾表演过一个绝技：在炮口上放一杯啤酒，然后全速行驶并急停，而杯中的啤酒一滴未洒，展示了其火炮稳定系统的惊人性能。",
-                svgConfig: { chassisW: 160, chassisH: 65, turretType: 'angled', turretW: 70, turretH: 35, barrelL: 110, barrelW: 8, color: '#55584c' }
-            },
-            // 5. Merkava IV (Israel)
-            {
-                id: 5,
-                name: "梅卡瓦 IV",
-                country: "以色列",
-                params: { "主炮": "120mm MG253 滑膛炮", "装甲": "模块化复合装甲", "速度": "64 km/h", "重量": "65吨" },
-                funFact: "“梅卡瓦”是世界上唯一将发动机前置的主战坦克。这种独特设计是为了将巨大的发动机作为一道额外屏障，最大限度地保护车内成员的安全，体现了“生命至上”的设计哲学。",
-                svgConfig: { chassisW: 155, chassisH: 60, turretType: 'angled', turretW: 80, turretH: 40, barrelL: 95, barrelW: 8, color: '#c4b79d' }
-            },
-            // 6. Challenger 2 (UK)
-            {
-                id: 6,
-                name: "挑战者 2",
-                country: "英国",
-                params: { "主炮": "120mm L30A1 线膛炮", "装甲": "乔巴姆装甲", "速度": "59 km/h", "重量": "64吨" },
-                funFact: "“挑战者2”是现代主战坦克中少有的仍坚持使用线膛炮的型号，这使其在发射碎甲弹时精度更高。它还保持着一项未被击毁的战场记录。",
-                svgConfig: { chassisW: 160, chassisH: 70, turretType: 'box', turretW: 75, turretH: 38, barrelL: 105, barrelW: 8, color: '#9d957f' }
-            },
-            // 7. Type 99A (China)
-            {
-                id: 7,
-                name: "99A式主战坦克",
-                country: "中国",
-                params: { "主炮": "125mm 滑膛炮", "装甲": "复合装甲+ERA", "速度": "75 km/h", "重量": "55吨" },
-                funFact: "99A坦克装备了一套独特的“激光压制观瞄系统”，理论上可以干扰甚至烧毁敌方的光学观瞄设备，是一种“致盲”武器，体现了非对称作战的思想。",
-                svgConfig: { chassisW: 150, chassisH: 65, turretType: 'angled', turretW: 70, turretH: 35, barrelL: 100, barrelW: 9, color: '#5f665a' }
-            },
-            // 8. Leclerc (France)
-            {
-                id: 8,
-                name: "勒克莱尔",
-                country: "法国",
-                params: { "主炮": "120mm CN120-26 滑膛炮", "装甲": "模块化复合装甲", "速度": "71 km/h", "重量": "57吨" },
-                funFact: "“勒克莱尔”是世界上第一款采用自动装弹机并因此将成员减至3人（车长、炮手、驾驶员）的西方主战坦克。它的自动装弹机使其射速高达每分钟12发。",
-                svgConfig: { chassisW: 145, chassisH: 60, turretType: 'angled', turretW: 65, turretH: 30, barrelL: 100, barrelW: 8, color: '#6a695e' }
-            },
-            // 9. Strv 103 (Sweden)
-            {
-                id: 9,
-                name: "Strv 103 (S坦克)",
-                country: "瑞典",
-                params: { "主炮": "105mm L74", "装甲": "70mm (大倾角)", "速度": "60 km/h", "重量": "42吨" },
-                funFact: "这是一款没有炮塔的“无头”坦克！它依靠调整整个车体的液气悬挂系统来俯仰火炮，依靠转向车体来瞄准。这种奇特设计使其外形极为低矮，隐蔽性极佳。",
-                svgConfig: { chassisW: 160, chassisH: 50, turretType: 'none', turretW: 0, turretH: 0, barrelL: 110, barrelW: 7, color: '#4a5344' }
-            },
-            // 10. Bob Semple Tank (New Zealand)
-            {
-                id: 10,
-                name: "鲍勃·森普尔坦克",
-                country: "新西兰",
-                params: { "武器": "多挺机枪", "装甲": "波纹铁皮", "速度": "约12 km/h", "重量": "25吨" },
-                funFact: "被誉为“史上最差坦克”。它是在拖拉机底盘上焊上波纹铁皮制成的，装甲甚至无法抵御步枪子弹。由于性能太差，它从未上过战场，成为了一个著名的笑谈。",
-                svgConfig: { chassisW: 120, chassisH: 80, turretType: 'box', turretW: 50, turretH: 50, barrelL: 40, barrelW: 4, color: '#8c8c8c' }
-            },
+            { id: 1, name: "虎式 I 型", country: "德国", params: { "主炮": "88mm KwK 36", "装甲": "120mm", "速度": "45 km/h", "重量": "57吨" }, funFact: "一辆“虎式”坦克的造价可以制造出三辆“黑豹”或四辆“四号”坦克。其复杂的“交错式负重轮”虽然提供了极佳的稳定性，但在东线的泥泞和严寒中却是个噩梦。", modelConfig: { chassis: [1.5, 0.7, 1], turretType: 'box', turret: [0.6, 0.4, 0.6], barrel: [1.2, 0.08], color: '#8B857A' } },
+            { id: 2, name: "T-34/85", country: "苏联", params: { "主炮": "85mm ZIS-S-53", "装甲": "90mm (倾斜)", "速度": "55 km/h", "重量": "32吨" }, funFact: "T-34的“倾斜装甲”设计是革命性的，它能有效地弹开炮弹。它被认为是二战中最具综合优势的坦克，简单、廉价且高效。", modelConfig: { chassis: [1.4, 0.6, 0.9], turretType: 'round', turret: [0.65, 0.45, 0.65], barrel: [1.1, 0.07], color: '#556B2F' } },
+            { id: 3, name: "M4 谢尔曼", country: "美国", params: { "主炮": "75mm M3", "装甲": "76mm", "速度": "48 km/h", "重量": "30吨" }, funFact: "谢尔曼坦克的外号是“朗森打火机”，因其早期型号使用的汽油发动机在被击中后容易起火。但它真正的优势在于惊人的产量和可靠性。", modelConfig: { chassis: [1.3, 0.75, 0.9], turretType: 'round', turret: [0.55, 0.4, 0.55], barrel: [0.8, 0.06], color: '#6B8E23' } },
+            { id: 4, name: "豹 2A7", country: "德国", params: { "主炮": "120mm L/55 滑膛炮", "装甲": "复合装甲", "速度": "72 km/h", "重量": "67吨" }, funFact: "在一次国际坦克比赛中，豹2坦克曾表演过一个绝技：在炮口上放一杯啤酒，然后全速行驶并急停，而杯中的啤酒一滴未洒。", modelConfig: { chassis: [1.6, 0.65, 1.1], turretType: 'angled', turret: [0.7, 0.35, 0.8], barrel: [1.3, 0.08], color: '#464A42' } },
+            { id: 5, name: "梅卡瓦 IV", country: "以色列", params: { "主炮": "120mm MG253 滑膛炮", "装甲": "模块化复合装甲", "速度": "64 km/h", "重量": "65吨" }, funFact: "“梅卡瓦”是世界上唯一将发动机前置的主战坦克。这种独特设计是为了将巨大的发动机作为一道额外屏障，最大限度地保护车内成员的安全。", modelConfig: { chassis: [1.55, 0.6, 1.05], turretType: 'angled', turret: [0.8, 0.4, 0.9], barrel: [1.15, 0.08], color: '#C4B79D' } },
+            { id: 6, name: "挑战者 2", country: "英国", params: { "主炮": "120mm L30A1 线膛炮", "装甲": "乔巴姆装甲", "速度": "59 km/h", "重量": "64吨" }, funFact: "“挑战者2”是现代主战坦克中少有的仍坚持使用线膛炮的型号，这使其在发射碎甲弹时精度更高。它还保持着一项未被击毁的战场记录。", modelConfig: { chassis: [1.6, 0.7, 1.1], turretType: 'box', turret: [0.75, 0.38, 0.85], barrel: [1.25, 0.08], color: '#9D957F' } },
+            { id: 7, name: "99A式主战坦克", country: "中国", params: { "主炮": "125mm 滑膛炮", "装甲": "复合装甲+ERA", "速度": "75 km/h", "重量": "55吨" }, funFact: "99A坦克装备了一套独特的“激光压制观瞄系统”，理论上可以干扰甚至烧毁敌方的光学观瞄设备，是一种“致盲”武器。", modelConfig: { chassis: [1.5, 0.65, 1.0], turretType: 'angled', turret: [0.7, 0.35, 0.8], barrel: [1.2, 0.09], color: '#5F665A' } },
+            { id: 8, name: "勒克莱尔", country: "法国", params: { "主炮": "120mm CN120-26 滑膛炮", "装甲": "模块化复合装甲", "速度": "71 km/h", "重量": "57吨" }, funFact: "“勒克莱尔”是世界上第一款采用自动装弹机并因此将成员减至3人的西方主战坦克。它的自动装弹机使其射速高达每分钟12发。", modelConfig: { chassis: [1.45, 0.6, 1.0], turretType: 'angled', turret: [0.65, 0.3, 0.75], barrel: [1.2, 0.08], color: '#6A695E' } },
+            { id: 9, name: "Strv 103 (S坦克)", country: "瑞典", params: { "主炮": "105mm L74", "装甲": "70mm (大倾角)", "速度": "60 km/h", "重量": "42吨" }, funFact: "这是一款没有炮塔的“无头”坦克！它依靠调整整个车体的液气悬挂系统来俯仰火炮，依靠转向车体来瞄准。", modelConfig: { chassis: [1.6, 0.5, 0.95], turretType: 'none', turret: [0, 0, 0], barrel: [1.3, 0.07], color: '#4A5344' } },
+            { id: 10, name: "鲍勃·森普尔坦克", country: "新西兰", params: { "武器": "多挺机枪", "装甲": "波纹铁皮", "速度": "约12 km/h", "重量": "25吨" }, funFact: "被誉为“史上最差坦克”。它是在拖拉机底盘上焊上波纹铁皮制成的，装甲甚至无法抵御步枪子弹。它从未上过战场。", modelConfig: { chassis: [1.2, 0.8, 1.1], turretType: 'box', turret: [0.5, 0.5, 0.5], barrel: [0.5, 0.04], color: '#8C8C8C' } },
         ];
 
-        // Programmatically generate the rest of the 100 tanks
         const countries = ["未来联邦", "火星殖民地", "深海王国", "天空之城"];
-        const funFacts = [
-            "这款坦克的装甲采用了记忆金属，受到攻击后可以缓慢恢复原状。",
-            "其动力来源是微型核聚变反应堆，理论上拥有无限续航能力。",
-            "装备了光学迷彩系统，可以在战场上实现短暂的隐形。",
-            "驾驶舱采用了神经连接技术，驾驶员可以用思想来操控坦克。",
-            "它的主炮可以发射压缩等离子炮弹，威力巨大。"
-        ];
-
+        const funFacts = ["这款坦克的装甲采用了记忆金属，受到攻击后可以缓慢恢复原状。", "其动力来源是微型核聚变反应堆，理论上拥有无限续航能力。", "装备了光学迷彩系统，可以在战场上实现短暂的隐形。"];
         for (let i = 11; i <= 100; i++) {
-            const country = countries[(i - 11) % countries.length];
-            const funFact = funFacts[(i - 11) % funFacts.length];
-            tankData.push({
-                id: i,
-                name: `X-${i} 型未来战车`,
-                country: country,
-                params: {
-                    "主炮": `${100 + i % 20}mm 电磁炮`,
-                    "装甲": "量子泡沫装甲",
-                    "速度": `${80 + i % 30} km/h`,
-                    "重量": `${40 + i % 15}吨`
-                },
-                funFact: funFact,
-                svgConfig: {
-                    chassisW: 130 + Math.random() * 30,
-                    chassisH: 60 + Math.random() * 20,
-                    turretType: ['box', 'round', 'angled'][i % 3],
-                    turretW: 50 + Math.random() * 20,
-                    turretH: 30 + Math.random() * 15,
-                    barrelL: 90 + Math.random() * 30,
-                    barrelW: 7 + Math.random() * 2,
-                    color: `hsl(${200 + Math.random() * 100}, 20%, ${50 + Math.random() * 20}%)`
-                }
-            });
+            tankData.push({ id: i, name: `X-${i} 型未来战车`, country: countries[(i - 11) % countries.length], params: { "主炮": `${100 + i % 20}mm 电磁炮`, "装甲": "量子泡沫装甲", "速度": `${80 + i % 30} km/h` }, funFact: funFacts[(i - 11) % funFacts.length], modelConfig: { chassis: [1.3 + Math.random() * 0.3, 0.6 + Math.random() * 0.2, 0.9 + Math.random() * 0.2], turretType: ['box', 'round', 'angled'][i % 3], turret: [0.5 + Math.random() * 0.2, 0.3 + Math.random() * 0.15, 0.5 + Math.random() * 0.2], barrel: [1.1 + Math.random() * 0.3, 0.07 + Math.random() * 0.02], color: `hsl(${180 + Math.random() * 120}, 70%, ${30 + Math.random() * 20}%)` } });
         }
-
 
         // --- DOM ELEMENTS ---
         const tankGrid = document.getElementById('tank-grid');
         const modal = document.getElementById('tank-modal');
-        const modalContent = document.getElementById('modal-content');
+        const modal3DContainer = document.getElementById('modal-3d-container');
         const closeModalBtn = document.getElementById('close-modal');
-        const svgContainer = document.getElementById('svg-container');
         const modalTankName = document.getElementById('modal-tank-name');
         const modalTankParams = document.getElementById('modal-tank-params');
         const modalTankFunFact = document.getElementById('modal-tank-fun-fact');
 
-        // --- SVG GENERATION & ANIMATION ---
-        function createTankSVG(config) {
-            const { chassisW, chassisH, turretType, turretW, turretH, barrelL, barrelW, color } = config;
-            const svgNS = "http://www.w3.org/2000/svg";
-            
-            const svg = document.createElementNS(svgNS, "svg");
-            svg.setAttribute("viewBox", `0 0 200 120`);
-            svg.setAttribute("width", "100%");
-            svg.setAttribute("height", "100%");
-
-            const defs = document.createElementNS(svgNS, "defs");
-            const filter = document.createElementNS(svgNS, "filter");
-            filter.id = "glow";
-            filter.innerHTML = `<feGaussianBlur stdDeviation="2.5" result="coloredBlur"></feGaussianBlur>
-            <feMerge>
-                <feMergeNode in="coloredBlur"></feMergeNode>
-                <feMergeNode in="SourceGraphic"></feMergeNode>
-            </feMerge>`;
-            defs.appendChild(filter);
-            svg.appendChild(defs);
-
-            const g = document.createElementNS(svgNS, "g");
-            g.setAttribute("transform", "translate(100, 60)");
-            svg.appendChild(g);
+        // --- 3D Scene State ---
+        let scene, camera, renderer, controls, animationId;
+        
+        // --- 3D MODEL GENERATION ---
+        function createTank3D(config) {
+            const tankGroup = new THREE.Group();
+            const material = new THREE.MeshStandardMaterial({ color: config.color, roughness: 0.6, metalness: 0.4 });
 
             // Chassis
-            const chassis = document.createElementNS(svgNS, "rect");
-            chassis.setAttribute("x", -chassisW / 2);
-            chassis.setAttribute("y", -chassisH / 2);
-            chassis.setAttribute("width", chassisW);
-            chassis.setAttribute("height", chassisH);
-            chassis.setAttribute("fill", color);
-            chassis.setAttribute("stroke", "#ffffff44");
-            chassis.setAttribute("rx", 5);
-            g.appendChild(chassis);
+            const chassisGeo = new THREE.BoxGeometry(...config.chassis);
+            const chassis = new THREE.Mesh(chassisGeo, material);
+            tankGroup.add(chassis);
 
-            // Turret
-            let turret;
-            if (turretType !== 'none') {
-                if (turretType === 'round') {
-                    turret = document.createElementNS(svgNS, "ellipse");
-                    turret.setAttribute("cx", 0);
-                    turret.setAttribute("cy", -chassisH / 2 + 5);
-                    turret.setAttribute("rx", turretW / 2);
-                    turret.setAttribute("ry", turretH / 2);
-                } else if (turretType === 'angled') {
-                    turret = document.createElementNS(svgNS, "path");
-                    const pathData = `M ${-turretW/2},${-chassisH/2} L ${turretW/2},${-chassisH/2} L ${turretW/2 - 10},${-chassisH/2 - turretH} L ${-turretW/2 + 10},${-chassisH/2 - turretH} Z`;
-                    turret.setAttribute("d", pathData);
+            // Turret Group (for rotation)
+            const turretGroup = new THREE.Group();
+            turretGroup.position.y = config.chassis[1] / 2;
+            tankGroup.add(turretGroup);
+
+            // Turret and Barrel
+            if (config.turretType !== 'none') {
+                let turretGeo;
+                if (config.turretType === 'round') {
+                    turretGeo = new THREE.CylinderGeometry(config.turret[0] / 2, config.turret[0] / 2, config.turret[1], 32);
+                } else if (config.turretType === 'angled') {
+                    const shape = new THREE.Shape();
+                    const w = config.turret[0];
+                    const d = config.turret[2];
+                    shape.moveTo(-w/2, -d/2);
+                    shape.lineTo(w/2, -d/2);
+                    shape.lineTo(w/2 - 0.2, d/2);
+                    shape.lineTo(-w/2 + 0.2, d/2);
+                    shape.closePath();
+                    const extrudeSettings = { depth: config.turret[1], bevelEnabled: false };
+                    turretGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+                    turretGeo.rotateX(-Math.PI / 2); // Correct orientation
                 } else { // box
-                    turret = document.createElementNS(svgNS, "rect");
-                    turret.setAttribute("x", -turretW / 2);
-                    turret.setAttribute("y", -chassisH / 2 - turretH + 5);
-                    turret.setAttribute("width", turretW);
-                    turret.setAttribute("height", turretH);
-                    turret.setAttribute("rx", 2);
+                    turretGeo = new THREE.BoxGeometry(...config.turret);
                 }
-                turret.setAttribute("fill", color);
-                turret.setAttribute("stroke", "#ffffff66");
-                turret.style.filter = "url(#glow)";
-                g.appendChild(turret);
+                const turret = new THREE.Mesh(turretGeo, material);
+                turret.position.y = config.turret[1] / 2;
+                turretGroup.add(turret);
 
-                // Barrel
-                const barrel = document.createElementNS(svgNS, "rect");
-                barrel.setAttribute("x", turretW / 4);
-                barrel.setAttribute("y", -chassisH / 2 - barrelW / 2);
-                barrel.setAttribute("width", barrelL);
-                barrel.setAttribute("height", barrelW);
-                barrel.setAttribute("fill", "#333");
-                barrel.setAttribute("stroke", "#555");
-                g.appendChild(barrel);
-                
-                // Animate turret and barrel
-                gsap.fromTo(turret, { rotation: -5, transformOrigin: 'center center' }, { rotation: 5, duration: 4, repeat: -1, yoyo: true, ease: 'sine.inOut' });
-                gsap.fromTo(barrel, { rotation: -5, transformOrigin: '0% 50%' }, { rotation: 5, duration: 4, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+                const barrelGeo = new THREE.CylinderGeometry(config.barrel[1] / 2, config.barrel[1] / 2, config.barrel[0], 16);
+                const barrel = new THREE.Mesh(barrelGeo, material);
+                barrel.rotation.z = Math.PI / 2;
+                barrel.position.x = config.barrel[0] / 2;
+                barrel.position.y = config.turret[1] / 2;
+                turretGroup.add(barrel);
+            } else { // For S-Tank
+                const barrelGeo = new THREE.CylinderGeometry(config.barrel[1] / 2, config.barrel[1] / 2, config.barrel[0], 16);
+                const barrel = new THREE.Mesh(barrelGeo, material);
+                barrel.rotation.z = Math.PI / 2;
+                barrel.position.x = config.barrel[0] / 2;
+                barrel.position.y = config.chassis[1] / 2;
+                tankGroup.add(barrel);
             }
             
             // Treads
-            const tread = document.createElementNS(svgNS, "rect");
-            tread.setAttribute("x", -chassisW / 2 - 5);
-            tread.setAttribute("y", -chassisH / 2 - 5);
-            tread.setAttribute("width", chassisW + 10);
-            tread.setAttribute("height", chassisH + 10);
-            tread.setAttribute("fill", "#333");
-            tread.setAttribute("stroke", "#444");
-            tread.setAttribute("rx", 8);
-            g.insertBefore(tread, chassis);
+            const treadHeight = config.chassis[1] * 0.8;
+            const treadGeo = new THREE.BoxGeometry(config.chassis[0] * 1.05, treadHeight, config.chassis[2] * 1.2);
+            const treadMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.8 });
+            const treads = new THREE.Mesh(treadGeo, treadMat);
+            treads.position.y = -config.chassis[1]/2 + treadHeight/2;
+            tankGroup.add(treads);
 
-            return svg;
+            tankGroup.userData.turret = turretGroup;
+            return tankGroup;
         }
-
 
         // --- RENDER LOGIC ---
         function renderTankGrid() {
             tankGrid.innerHTML = '';
             tankData.forEach(tank => {
                 const card = document.createElement('div');
-                card.className = 'card-glow bg-gray-800/50 p-3 rounded-lg cursor-pointer flex flex-col items-center text-center';
+                card.className = 'card-glow p-3 rounded-lg cursor-pointer flex flex-col items-center text-center h-48 justify-between';
                 card.innerHTML = `
-                    <div class="w-full h-20 mb-2 flex items-center justify-center">
-                        ${createTankSVG(tank.svgConfig).outerHTML}
+                    <div class="w-full h-24" id="card-3d-${tank.id}"></div>
+                    <div>
+                        <h3 class="font-orbitron text-sm font-bold text-white">${tank.name}</h3>
+                        <p class="text-xs text-cyan-400">${tank.country}</p>
                     </div>
-                    <h3 class="font-orbitron text-sm font-bold text-white">${tank.name}</h3>
-                    <p class="text-xs text-cyan-400">${tank.country}</p>
                 `;
                 card.addEventListener('click', () => openModal(tank));
                 tankGrid.appendChild(card);
+                renderCardPreview(tank);
             });
+        }
+
+        function renderCardPreview(tank) {
+            const container = document.getElementById(`card-3d-${tank.id}`);
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 100);
+            camera.position.set(2, 1.5, 2.5);
+            camera.lookAt(0, 0, 0);
+
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            const light = new THREE.DirectionalLight(0xffffff, 1);
+            light.position.set(5, 5, 5);
+            scene.add(light);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+            const tankModel = createTank3D(tank.modelConfig);
+            scene.add(tankModel);
+
+            tankModel.rotation.y = -0.5;
+            renderer.render(scene, camera);
         }
 
         function openModal(tank) {
             modalTankName.textContent = `${tank.name} (${tank.country})`;
-            
             modalTankParams.innerHTML = '';
-            for (const [key, value] of Object.entries(tank.params)) {
+            Object.entries(tank.params).forEach(([key, value]) => {
                 const li = document.createElement('li');
                 li.innerHTML = `<span class="font-bold text-cyan-400/80">${key}:</span> ${value}`;
                 modalTankParams.appendChild(li);
-            }
-
+            });
             modalTankFunFact.textContent = tank.funFact;
 
-            svgContainer.innerHTML = '';
-            const newSvg = createTankSVG(tank.svgConfig);
-            svgContainer.appendChild(newSvg);
+            init3DScene(modal3DContainer, tank.modelConfig);
             
-            // Animate modal entrance
             modal.classList.remove('hidden');
-            gsap.from(modalContent, { opacity: 0, scale: 0.9, y: -50, duration: 0.4, ease: 'power3.out' });
+        }
+
+        function init3DScene(container, config) {
+            // Scene
+            scene = new THREE.Scene();
+            
+            // Camera
+            camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(3, 2, 4);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.minDistance = 2;
+            controls.maxDistance = 10;
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            directionalLight.position.set(5, 10, 7.5);
+            scene.add(directionalLight);
+            
+            // Model
+            const tankModel = createTank3D(config);
+            scene.add(tankModel);
+
+            // Animation
+            const clock = new THREE.Clock();
+            function animate() {
+                animationId = requestAnimationFrame(animate);
+                const delta = clock.getDelta();
+
+                // Subtle animations
+                if (tankModel.userData.turret) {
+                    tankModel.userData.turret.rotation.y += delta * 0.1;
+                }
+                tankModel.position.y = Math.sin(clock.getElapsedTime() * 0.5) * 0.05;
+
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            animate();
         }
 
         function closeModal() {
-            gsap.to(modalContent, { 
-                opacity: 0, 
-                scale: 0.9, 
-                y: -50, 
-                duration: 0.3, 
-                ease: 'power3.in',
-                onComplete: () => modal.classList.add('hidden')
-            });
+            modal.classList.add('hidden');
+            // Cleanup 3D scene
+            cancelAnimationFrame(animationId);
+            if (scene) {
+                scene.traverse(object => {
+                    if (object.isMesh) {
+                        if (object.geometry) object.geometry.dispose();
+                        if (object.material) {
+                            if (Array.isArray(object.material)) {
+                                object.material.forEach(material => material.dispose());
+                            } else {
+                                object.material.dispose();
+                            }
+                        }
+                    }
+                });
+            }
+            if (renderer) {
+                renderer.dispose();
+                modal3DContainer.innerHTML = '';
+            }
+            scene = null; camera = null; renderer = null; controls = null;
         }
 
         // --- EVENT LISTENERS ---
         closeModalBtn.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal();
-            }
-        });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                closeModal();
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal(); });
+        window.addEventListener('resize', () => {
+            if (renderer && camera) {
+                const container = modal3DContainer;
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
             }
         });
 
         // --- INITIALIZATION ---
-        // GSAP (GreenSock Animation Platform) for smooth animations
-        const gsapScript = document.createElement('script');
-        gsapScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
-        gsapScript.onload = () => {
-            // Start the application after GSAP is loaded
-            renderTankGrid();
-        };
-        document.head.appendChild(gsapScript);
-
+        renderTankGrid();
     </script>
 </body>
 </html>
