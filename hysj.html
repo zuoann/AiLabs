@@ -3,299 +3,388 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>海洋珍奇鱼类图鉴</title>
+    <title>深海数据方舟</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --glow-color: rgba(0, 255, 255, 0.7);
+        }
         body {
             font-family: 'Noto Sans SC', sans-serif;
-            overflow: hidden; /* Hide scrollbars initially */
+            background-color: #000c1a;
+            color: #e0f7fa;
+            overflow: hidden;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%2300ffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="2" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"></line><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="6.34" y2="17.66"></line><line x1="17.66" y1="6.34" x2="19.07" y2="4.93"></line></svg>'), auto;
         }
-        .font-mashan {
-            font-family: 'Ma Shan Zheng', cursive;
-        }
-        /* Underwater background effect */
+        .font-mashan { font-family: 'Ma Shan Zheng', cursive; }
+        
         #ocean-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, #001f3f, #0074D9, #7FDBFF);
-            background-size: 100% 400%;
-            animation: gradient-animation 20s ease infinite;
-            z-index: -1;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(ellipse at bottom, #003366 0%, #000c1a 70%);
+            z-index: -2;
         }
-        @keyframes gradient-animation {
-            0% { background-position: 0% 0%; }
-            50% { background-position: 0% 100%; }
-            100% { background-position: 0% 0%; }
+        .light-beam {
+            position: fixed; top: -100%; left: 50%; width: 2px; height: 200%;
+            background: linear-gradient(to bottom, rgba(0,255,255,0), rgba(0,255,255,0.3), rgba(0,255,255,0));
+            transform-origin: top center;
+            animation: scan 15s linear infinite;
         }
-        /* Bubbles animation */
-        .bubble {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            bottom: -50px;
-            animation: rise 10s infinite ease-in;
+        @keyframes scan {
+            from { transform: rotate(-45deg) translateX(-50%); }
+            to { transform: rotate(45deg) translateX(50%); }
         }
-        @keyframes rise {
-            0% {
-                transform: translateY(0) scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-120vh) scale(1.5);
-                opacity: 0;
-            }
+
+        #main-container {
+            height: 100vh;
+            overflow-y: auto;
+            scroll-behavior: smooth;
         }
-        /* Fish card animation */
+        #main-container::-webkit-scrollbar { width: 8px; }
+        #main-container::-webkit-scrollbar-track { background: transparent; }
+        #main-container::-webkit-scrollbar-thumb { background: rgba(0, 255, 255, 0.5); border-radius: 4px; }
+
         .fish-card {
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            animation: float 6s ease-in-out infinite;
+            background: rgba(0, 50, 80, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 1rem;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            transform-style: preserve-3d;
         }
         .fish-card:hover {
-            transform: translateY(-15px) scale(1.05);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transform: translateY(-10px) rotateX(5deg) rotateY(5deg) scale(1.05);
+            box-shadow: 0 0 25px var(--glow-color), 0 0 10px var(--glow-color) inset;
+            border-color: rgba(0, 255, 255, 0.7);
         }
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
+
+        .fish-animation-container {
+            width: 100%; height: 180px; display: flex; align-items: center; justify-content: center; overflow: hidden;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
         }
-        /* Custom scrollbar */
-        #main-content::-webkit-scrollbar {
-            width: 8px;
+
+        /* Modal Styles */
+        #modal {
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
-        #main-content::-webkit-scrollbar-track {
-            background: rgba(0, 116, 217, 0.3);
-            border-radius: 10px;
+        #modal-content {
+            background: rgba(0, 25, 40, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
         }
-        #main-content::-webkit-scrollbar-thumb {
-            background: rgba(127, 219, 255, 0.8);
-            border-radius: 10px;
-        }
-        #main-content::-webkit-scrollbar-thumb:hover {
-            background: #7FDBFF;
-        }
-        /* Disabled button style */
-        button:disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
+        .modal-enter { opacity: 0; transform: scale(0.9); }
+        .modal-leave-to { opacity: 0; transform: scale(0.9); }
+        
+        /* --- ALL 50 UNIQUE ANIMATIONS --- */
+        @keyframes swim-clownfish { 0%,100%{transform:translate(0,0) rotate(0deg)}25%{transform:translate(15px,5px) rotate(5deg)}50%{transform:translate(0,0) rotate(0deg)}75%{transform:translate(-15px,-5px) rotate(-5deg)} } .clownfish-anim{animation:swim-clownfish 4s ease-in-out infinite}
+        @keyframes swim-mandarin { 0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(8px) rotate(2deg)} } .mandarinfish-anim{animation:swim-mandarin 5s ease-in-out infinite}
+        @keyframes swim-tang { 0%,100%{transform:translateX(0)}40%{transform:translateX(30px)}50%{transform:translateX(25px)}90%{transform:translateX(-30px)} } .regal-tang-anim{animation:swim-tang 3s ease-in-out infinite}
+        @keyframes float-lionfish { 0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.02)} } .lionfish-anim{animation:float-lionfish 7s ease-in-out infinite}
+        @keyframes swim-anglerfish { 0%,100%{transform:translateY(0)}50%{transform:translateY(5px)} } @keyframes lure-blink{0%,100%{opacity:.5}50%{opacity:1}} .anglerfish-anim{animation:swim-anglerfish 8s ease-in-out infinite} .anglerfish-anim .lure-light{animation:lure-blink 3s linear infinite}
+        @keyframes lurk-viperfish { 0%,100%{transform:translateX(0)}50%{transform:translateX(10px)} } .viperfish-anim{animation:lurk-viperfish 9s ease-in-out infinite}
+        @keyframes flap-manta { 0%,100%{transform:scaleY(1) translateY(0)}50%{transform:scaleY(.9) translateY(10px)} } .manta-ray-anim{animation:flap-manta 6s ease-in-out infinite}
+        @keyframes glide-whale { 0%{transform:translateX(-40px)}100%{transform:translateX(40px)} } .whale-shark-anim{animation:glide-whale 12s linear infinite alternate}
+        @keyframes bob-seahorse { 0%,100%{transform:translateY(0) rotate(3deg)}50%{transform:translateY(-10px) rotate(-3deg)} } .seahorse-anim{animation:bob-seahorse 4.5s ease-in-out infinite}
+        @keyframes pulse-jellyfish { 0%,100%{transform:scale(1,1)}50%{transform:scale(1.1,.9)} } @keyframes drift-tentacles{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}} .jellyfish-anim{animation:pulse-jellyfish 3.5s ease-in-out infinite} .jellyfish-anim .tentacle{animation:drift-tentacles 3.5s ease-in-out infinite}
+        @keyframes leap-dolphin { 0%{transform:translate(0,0) rotate(-10deg)}50%{transform:translate(10px,-15px) rotate(10deg)}100%{transform:translate(0,0) rotate(-10deg)} } .dolphin-anim{animation:leap-dolphin 2.8s ease-in-out infinite}
+        @keyframes puff-pufferfish { 0%,100%{transform:scale(1)}10%{transform:scale(1.2)}20%{transform:scale(1)} } .pufferfish-anim{animation:puff-pufferfish 5.5s ease-in-out infinite}
+        @keyframes charge-swordfish { 0%{transform:translateX(-30px)}100%{transform:translateX(30px)} } .swordfish-anim{animation:charge-swordfish 1.5s ease-in-out infinite alternate}
+        @keyframes crawl-octopus { 0%,100%{transform:translateY(0)}25%{transform:translateY(-5px) rotate(2deg)}75%{transform:translateY(5px) rotate(-2deg)} } .octopus-anim{animation:crawl-octopus 6s ease-in-out infinite}
+        @keyframes scan-hammerhead { 0%,100%{transform:rotate(-5deg) translateX(-5px)}50%{transform:rotate(5deg) translateX(5px)} } .hammerhead-shark-anim{animation:scan-hammerhead 7s ease-in-out infinite alternate}
+        @keyframes slither-eel { 0%{transform:skewX(0deg) translateX(-10px)}50%{transform:skewX(15deg) translateX(10px)}100%{transform:skewX(0deg) translateX(-10px)} } .eel-anim{animation:slither-eel 4s ease-in-out infinite}
+        @keyframes paddle-turtle { 0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)} } .turtle-anim{animation:paddle-turtle 8s ease-in-out infinite}
+        @keyframes flutter-butterfly { 0%,100%{transform:scale(1) rotate(0)}25%{transform:scale(1.05) rotate(3deg)}75%{transform:scale(1.05) rotate(-3deg)} } .butterflyfish-anim{animation:flutter-butterfly 3.8s ease-in-out infinite}
+        @keyframes peck-parrotfish { 0%,100%{transform:rotate(0)}10%{transform:rotate(5deg)}20%{transform:rotate(0)} } .parrotfish-anim{animation:peck-parrotfish 5s linear infinite}
+        @keyframes regal-angelfish { 0%,100%{transform:skewY(0deg)}50%{transform:skewY(-5deg)} } .emperor-angelfish-anim{animation:regal-angelfish 6.5s ease-in-out infinite alternate}
+        @keyframes spin-starfish { 0%{transform:rotate(0deg) scale(1)}100%{transform:rotate(360deg) scale(1.05)} } .starfish-anim{animation:spin-starfish 20s linear infinite}
+        @keyframes dart-damselfish { 0%,100%{transform:translateX(0)}10%{transform:translateX(-20px)}20%{transform:translateX(20px)}30%{transform:translateX(0)} } .damselfish-anim{animation:dart-damselfish 2s ease-in-out infinite}
+        @keyframes hover-boxfish { 0%,100%{transform:translate(0,0)}25%{transform:translate(2px,2px)}50%{transform:translate(0,0)}75%{transform:translate(-2px,-2px)} } .boxfish-anim{animation:hover-boxfish 4s ease-in-out infinite}
+        @keyframes ghost-shark { 0%,100%{opacity:.7}50%{opacity:.9;transform:translateX(5px)} } .ghost-shark-anim{animation:ghost-shark 10s ease-in-out infinite alternate}
+        @keyframes drift-leafy { 0%,100%{transform:translateX(0) rotate(-2deg)}50%{transform:translateX(5px) rotate(2deg)} } .leafy-seadragon-anim{animation:drift-leafy 9s ease-in-out infinite}
+        @keyframes peck-moorish { 0%,100%{transform:skewY(0deg)}20%{transform:skewY(4deg)}40%{transform:skewY(0deg)} } .moorish-idol-anim{animation:peck-moorish 4s ease-in-out infinite}
+        @keyframes still-cardinal { 0%,100%{transform:scale(1)}50%{transform:scale(1.01)} } .banggai-cardinalfish-anim{animation:still-cardinal 8s ease-in-out infinite}
+        @keyframes clean-wrasse { 0%{transform:translateX(-25px)}50%{transform:translateX(25px)}100%{transform:translateX(-25px)} } .cleaner-wrasse-anim{animation:clean-wrasse 2.5s linear infinite}
+        @keyframes hide-trumpet { 0%,100%{transform:scaleX(1)}50%{transform:scaleX(.95)} } .trumpetfish-anim{animation:hide-trumpet 7s ease-in-out infinite}
+        @keyframes peek-squirrel { 0%,100%{transform:translateX(0)}50%{transform:translateX(8px)} } .squirrelfish-anim{animation:peek-squirrel 3.5s ease-in-out infinite alternate}
+        @keyframes forage-goat { 0%,100%{transform:rotate(0)}30%{transform:rotate(10deg)}60%{transform:rotate(0)} } .goatfish-anim{animation:forage-goat 4s ease-in-out infinite}
+        @keyframes charge-trigger { 0%,100%{transform:skewX(0)}50%{transform:skewX(-10deg)} } .triggerfish-anim{animation:charge-trigger 2s ease-in-out infinite alternate}
+        @keyframes ancient-frilled { 0%{transform:scaleY(1)}50%{transform:scaleY(.9)}100%{transform:scaleY(1)} } .frilled-shark-anim{animation:ancient-frilled 6s ease-in-out infinite}
+        @keyframes ink-squid { 0%,100%{transform:translate(0,0)}5%{transform:translate(-10px, -10px)}10%{transform:translate(0,0)} } .giant-squid-anim{animation:ink-squid 5s ease-in-out infinite}
+        @keyframes cloak-vampire { 0%,100%{opacity:.8}50%{opacity:1;transform:rotate(5deg)} } .vampire-squid-anim{animation:cloak-vampire 7s ease-in-out infinite alternate}
+        @keyframes melt-blobfish { 0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(10px) scale(1.1, .9)} } .blobfish-anim{animation:melt-blobfish 10s ease-in-out infinite}
+        @keyframes glow-dragon { 0%,100%{filter:brightness(1)}50%{filter:brightness(1.5)} } .dragonfish-anim{animation:glow-dragon 4s linear infinite}
+        @keyframes flash-lantern { 0%,100%{opacity:1}2%{opacity:.5}4%{opacity:1}50%{opacity:1}52%{opacity:.5}54%{opacity:1} } .lanternfish-anim{animation:flash-lantern 6s linear infinite}
+        @keyframes ribbon-oarfish { 0%{transform:rotate(2deg)}50%{transform:rotate(-2deg)}100%{transform:rotate(2deg)} } .oarfish-anim{animation:ribbon-oarfish 11s ease-in-out infinite}
+        @keyframes walk-coffin { 0%,100%{transform:rotate(0)}25%{transform:rotate(5deg)}75%{transform:rotate(-5deg)} } .coffinfish-anim{animation:walk-coffin 5s ease-in-out infinite}
+        @keyframes gaze-telescope { 0%,100%{transform:scale(1)}50%{transform:scale(1.05)} } .telescope-octopus-anim{animation:gaze-telescope 9s ease-in-out infinite}
+        @keyframes bite-fangtooth { 0%,100%{transform:translate(0,0)}50%{transform:translate(5px,2px)} } .fangtooth-anim{animation:bite-fangtooth 6s ease-in-out infinite alternate}
+        @keyframes gulp-eel { 0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.2)} } .gulper-eel-anim{animation:gulp-eel 8s ease-in-out infinite}
+        @keyframes hunt-white-shark { 0%,100%{transform:translateX(0)}50%{transform:translateX(20px)} } .great-white-shark-anim{animation:hunt-white-shark 5s ease-in-out infinite alternate}
+        @keyframes breach-humpback { 0%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-20px) rotate(5deg)}100%{transform:translateY(0) rotate(-5deg)} } .humpback-whale-anim{animation:breach-humpback 4.5s ease-in-out infinite}
+        @keyframes deep-blue { 0%{transform:translateX(-20px) scaleY(1)}50%{transform:translateX(20px) scaleY(1.02)}100%{transform:translateX(-20px) scaleY(1)} } .blue-whale-anim{animation:deep-blue 15s ease-in-out infinite}
+        @keyframes patrol-orca { 0%,100%{transform:translate(0,0)}50%{transform:translate(15px,0)} } .orca-anim{animation:patrol-orca 4s ease-in-out infinite alternate}
+        @keyframes sing-beluga { 0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)} } .beluga-whale-anim{animation:sing-beluga 6s ease-in-out infinite}
+        @keyframes joust-narwhal { 0%,100%{transform:translateX(0)}45%{transform:translateX(25px)}55%{transform:translateX(25px)}100%{transform:translateX(0)} } .narwhal-anim{animation:joust-narwhal 3s ease-in-out infinite}
+        @keyframes bask-sunfish { 0%,100%{transform:rotate(0deg)}50%{transform:rotate(10deg)} } .sunfish-anim{animation:bask-sunfish 13s ease-in-out infinite alternate}
+        @keyframes graze-dugong { 0%,100%{transform:translateY(0)}50%{transform:translateY(10px)} } .dugong-anim{animation:graze-dugong 9s ease-in-out infinite}
     </style>
 </head>
 <body class="bg-blue-900 text-white">
 
-    <!-- Ocean Background Container -->
     <div id="ocean-background"></div>
-    <div id="bubbles-container"></div>
-
-    <!-- Landing/Entry Section -->
-    <div id="landing-screen" class="fixed inset-0 flex flex-col items-center justify-center transition-opacity duration-1000 ease-in-out z-20 bg-black bg-opacity-30">
-        <h1 class="font-mashan text-6xl md:text-8xl text-white drop-shadow-lg mb-4">潜入深蓝</h1>
-        <p class="text-xl md:text-2xl text-gray-200 mb-8">探索海洋深处的奥秘</p>
-      
-    </div>
-
-    <!-- Main Content Section -->
-    <main id="main-content" class="container mx-auto px-4 py-8 opacity-0 transition-opacity duration-1000 ease-in-out hidden overflow-y-auto h-screen">
-        <header class="text-center mb-12">
-            <h1 class="font-mashan text-5xl md:text-7xl font-bold tracking-wider">珍奇鱼类图鉴</h1>
-            <p class="text-lg text-gray-300 mt-2">点击下方分类进行探索</p>
+    <div class="light-beam" style="left: 20%; animation-delay: -5s;"></div>
+    <div class="light-beam" style="left: 80%; animation-delay: -12s;"></div>
+    
+    <div id="main-container">
+        <header class="text-center pt-12 pb-8">
+            <h1 class="font-mashan text-5xl md:text-7xl font-bold tracking-wider text-cyan-300 drop-shadow-[0_0_10px_var(--glow-color)]">深海数据方舟</h1>
+            <p class="text-lg text-cyan-100 mt-2">点击卡片，解鎖海洋生物数据档案</p>
         </header>
 
-        <!-- Filter Buttons -->
-        <div id="filter-container" class="flex flex-wrap justify-center gap-3 mb-12">
-            <button class="filter-btn bg-white/20 backdrop-blur-sm py-2 px-5 rounded-full hover:bg-white/40 transition" data-category="all">全部</button>
-            <button class="filter-btn bg-white/10 backdrop-blur-sm py-2 px-5 rounded-full hover:bg-white/40 transition" data-category="珊瑚礁鱼类">珊瑚礁鱼类</button>
-            <button class="filter-btn bg-white/10 backdrop-blur-sm py-2 px-5 rounded-full hover:bg-white/40 transition" data-category="深海鱼类">深海鱼类</button>
-            <button class="filter-btn bg-white/10 backdrop-blur-sm py-2 px-5 rounded-full hover:bg-white/40 transition" data-category="大型海洋生物">大型海洋生物</button>
+        <div id="filter-container" class="flex flex-wrap justify-center gap-3 mb-12 px-4">
+            <!-- Filter buttons will be dynamically generated -->
         </div>
 
-        <!-- Fish Grid -->
-        <div id="fish-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            <!-- Fish cards will be injected here by JavaScript -->
+        <div id="fish-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 px-8 pb-12">
+            <!-- Fish cards will be injected here -->
         </div>
+    </div>
 
-        <footer class="text-center mt-16 pb-8">
-            <p class="text-gray-400">© 2025 海洋探索者</p>
-        </footer>
-    </main>
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 hidden modal-enter" role="dialog" aria-modal="true">
+        <div id="modal-content" class="w-full max-w-3xl rounded-2xl overflow-hidden transform transition-all">
+            <div class="relative">
+                <button id="modal-close-btn" class="absolute top-3 right-3 text-cyan-300 hover:text-white z-10">&times;</button>
+                <div id="modal-animation" class="h-64 flex items-center justify-center bg-black/20"></div>
+                <div class="p-6">
+                    <h2 id="modal-title" class="text-4xl font-bold font-mashan text-cyan-300"></h2>
+                    <p id="modal-category" class="text-sm text-cyan-200 uppercase tracking-widest mb-4"></p>
+                    <p id="modal-description" class="text-lg text-gray-300 mb-6"></p>
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="bg-cyan-900/50 p-3 rounded-lg">
+                            <h3 class="text-sm text-cyan-400">档案状态</h3>
+                            <p class="text-xl font-bold">已解鎖</p>
+                        </div>
+                        <div class="bg-cyan-900/50 p-3 rounded-lg">
+                            <h3 class="text-sm text-cyan-400">栖息深度</h3>
+                            <p id="modal-depth" class="text-xl font-bold"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
-    <!-- Mute Button -->
-    <button id="mute-button" class="fixed bottom-5 right-5 bg-white/20 backdrop-blur-sm p-3 rounded-full text-white hover:bg-white/40 transition z-30">
-        <svg id="volume-on-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-        <svg id="volume-off-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
-    </button>
-
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- DATA ---
-            // This is a sample of 20 fish. This structure can be expanded to 100.
-            const fishData = [
-                { name: 'Clownfish', chineseName: '小丑鱼', category: '珊瑚礁鱼类', description: '与海葵共生，色彩鲜艳，是海洋中最具辨识度的鱼类之一。', imageUrl: 'https://placehold.co/400x300/f39c12/white?text=小丑鱼' },
-                { name: 'Mandarinfish', chineseName: '麒麟鱼', category: '珊瑚礁鱼类', description: '因其迷幻般的色彩和图案而闻名，被认为是世界上最美丽的鱼。', imageUrl: 'https://placehold.co/400x300/3498db/white?text=麒麟鱼' },
-                { name: 'Regal Tang', chineseName: '蓝倒吊', category: '珊瑚礁鱼类', description: '鲜艳的蓝色身体和黄色尾巴，因电影《海底总动员》而广为人知。', imageUrl: 'https://placehold.co/400x300/2980b9/white?text=蓝倒吊' },
-                { name: 'Lionfish', chineseName: '狮子鱼', category: '珊瑚礁鱼类', description: '拥有引人注目的条纹和剧毒的鳍棘，是优雅而危险的掠食者。', imageUrl: 'https://placehold.co/400x300/c0392b/white?text=狮子鱼' },
-                { name: 'Emperor Angelfish', chineseName: '皇帝神仙鱼', category: '珊瑚礁鱼类', description: '体色华丽，幼鱼和成鱼的图案截然不同，极具观赏价值。', imageUrl: 'https://placehold.co/400x300/f1c40f/white?text=皇帝神仙鱼' },
-                { name: 'Butterflyfish', chineseName: '蝴蝶鱼', category: '珊瑚礁鱼类', description: '体态轻盈，色彩斑斓，常成对活动于珊瑚丛中。', imageUrl: 'https://placehold.co/400x300/e67e22/white?text=蝴蝶鱼' },
-                { name: 'Seahorse', chineseName: '海马', category: '珊瑚礁鱼类', description: '形态奇特，由雄性负责孵育后代，是海洋中的“模范父亲”。', imageUrl: 'https://placehold.co/400x300/2ecc71/white?text=海马' },
-                { name: 'Parrotfish', chineseName: '鹦嘴鱼', category: '珊瑚礁鱼类', description: '用其鹦鹉般的喙啃食珊瑚，是珊瑚礁生态系统的重要维护者。', imageUrl: 'https://placehold.co/400x300/1abc9c/white?text=鹦嘴鱼' },
-                { name: 'Anglerfish', chineseName: '琵琶鱼', category: '深海鱼类', description: '深海的潜伏猎手，用头顶的发光“钓竿”来引诱猎物。', imageUrl: 'https://placehold.co/400x300/34495e/white?text=琵琶鱼' },
-                { name: 'Viperfish', chineseName: '蝰蛇鱼', category: '深海鱼类', description: '拥有不成比例的巨大牙齿和发光器官，是深海中的凶猛捕食者。', imageUrl: 'https://placehold.co/400x300/2c3e50/white?text=蝰蛇鱼' },
-                { name: 'Goblin Shark', chineseName: '哥布林鲨', category: '深海鱼类', description: '被称为“活化石”，拥有可伸缩的下颚，捕食方式十分独特。', imageUrl: 'https://placehold.co/400x300/95a5a6/white?text=哥布林鲨' },
-                { name: 'Barreleye Fish', chineseName: '管眼鱼', category: '深海鱼类', description: '拥有透明的头部和可以向上看的管状眼睛，以适应深海的微光环境。', imageUrl: 'https://placehold.co/400x300/7f8c8d/white?text=管眼鱼' },
-                { name: 'Whale Shark', chineseName: '鲸鲨', category: '大型海洋生物', description: '海洋中最大的鱼类，性格温和，以浮游生物为食的滤食者。', imageUrl: 'https://placehold.co/400x300/5d6d7e/white?text=鲸鲨' },
-                { name: 'Manta Ray', chineseName: '蝠鲼', category: '大型海洋生物', description: '优雅的“海洋飞毯”，拥有巨大的翼展，在水中翩翩起舞。', imageUrl: 'https://placehold.co/400x300/8e44ad/white?text=蝠鲼' },
-                { name: 'Great White Shark', chineseName: '大白鲨', category: '大型海洋生物', description: '海洋顶级的掠食者，以其强大的力量和高效的捕食技巧而闻名。', imageUrl: 'https://placehold.co/400x300/bdc3c7/white?text=大白鲨' },
-                { name: 'Humpback Whale', chineseName: '座头鲸', category: '大型海洋生物', description: '以其动人的歌声和壮观的跃水动作而著称的海洋巨兽。', imageUrl: 'https://placehold.co/400x300/16a085/white?text=座头鲸' },
-                { name: 'Discus Fish', chineseName: '七彩神仙鱼', category: '珊瑚礁鱼类', description: '体形圆盘状，色彩变幻无穷，被誉为“热带鱼之王”。', imageUrl: 'https://placehold.co/400x300/d35400/white?text=七彩神仙鱼' },
-                { name: 'Moorish Idol', chineseName: '镰鱼', category: '珊瑚礁鱼类', description: '黑、白、黄三色相间，拥有极长的背鳍，姿态高雅。', imageUrl: 'https://placehold.co/400x300/ecf0f1/black?text=镰鱼' },
-                { name: 'Leafy Seadragon', chineseName: '叶海龙', category: '珊瑚礁鱼类', description: '伪装大师，全身长满叶状突出物，完美融入海草环境。', imageUrl: 'https://placehold.co/400x300/27ae60/white?text=叶海龙' },
-                { name: 'Banggai Cardinalfish', chineseName: '邦盖红衣主教鱼', category: '珊瑚礁鱼类', description: '优雅的黑白条纹和斑点，是濒危的珍稀鱼种。', imageUrl: 'https://placehold.co/400x300/9b59b6/white?text=邦盖红衣主教鱼' },
-            ];
+    document.addEventListener('DOMContentLoaded', () => {
+        const fishData = [
+            { name: 'Clownfish', chineseName: '小丑鱼', category: '珊瑚礁鱼类', description: '冷知识：它们可以改变自己的性别，但一生只能变一次，而且只能由雄性变为雌性。', animationType: 'clownfish', depth: '1-15米' },
+            { name: 'Mandarinfish', chineseName: '麒麟鱼', category: '珊瑚礁鱼类', description: '冷知识：它们是少数几种自身能产生蓝色色素的动物之一，而不是靠光的结构色。', animationType: 'mandarinfish', depth: '1-18米' },
+            { name: 'Regal Tang', chineseName: '蓝倒吊', category: '珊瑚礁鱼类', description: '冷知识：它们尾部的“手术刀”非常锋利，紧张时会竖起用于自卫。', animationType: 'regal-tang', depth: '2-40米' },
+            { name: 'Lionfish', chineseName: '狮子鱼', category: '珊瑚礁鱼类', description: '冷知识：它们的胃可以扩张到自身体积的30倍，是不折不扣的大胃王。', animationType: 'lionfish', depth: '1-175米' },
+            { name: 'Seahorse', chineseName: '海马', category: '珊瑚礁鱼类', description: '冷知识：海马是忠诚的“一夫一妻”制，每天早晨都会和伴侣一起跳“交谊舞”。', animationType: 'seahorse', depth: '1-20米' },
+            { name: 'Pufferfish', chineseName: '河豚', category: '珊瑚礁鱼类', description: '冷知识：雄性河豚会在海底用沙子建造精美的圆形“麦田怪圈”来吸引雌性。', animationType: 'pufferfish', depth: '2-100米' },
+            { name: 'Butterflyfish', chineseName: '蝴蝶鱼', category: '珊瑚礁鱼类', description: '冷知识：它们身上的“假眼”斑点是为了迷惑捕食者，让对方分不清头尾。', animationType: 'butterflyfish', depth: '1-25米' },
+            { name: 'Parrotfish', chineseName: '鹦嘴鱼', category: '珊瑚礁鱼类', description: '冷知识：夏威夷美丽的白沙滩，很多沙子其实是鹦嘴鱼吃掉珊瑚后排出的。', animationType: 'parrotfish', depth: '1-80米' },
+            { name: 'Emperor Angelfish', chineseName: '皇帝神仙鱼', category: '珊瑚礁鱼类', description: '冷知识：幼鱼时期的花纹和成年后完全不同，就像换了一套衣服。', animationType: 'emperor-angelfish', depth: '1-100米' },
+            { name: 'Eel', chineseName: '海鳗', category: '珊瑚礁鱼类', description: '冷知识：它们有两套下颚，一套在嘴里，另一套藏在喉咙里，可以伸出来捕捉猎物。', animationType: 'eel', depth: '1-500米' },
+            { name: 'Boxfish', chineseName: '箱鲀', category: '珊瑚礁鱼类', description: '冷知识：它们的身体骨骼结构启发了梅赛德斯-奔驰公司的仿生学概念车设计。', animationType: 'boxfish', depth: '1-50米' },
+            { name: 'Damselfish', chineseName: '雀鲷', category: '珊瑚礁鱼类', description: '冷知识：它们是出色的“农夫”，会“种植”并守护自己喜欢吃的藻类。', animationType: 'damselfish', depth: '1-15米' },
+            { name: 'Leafy Seadragon', chineseName: '叶海龙', category: '珊瑚礁鱼类', description: '冷知识：它们和海马是亲戚，但比海马更善于伪装，几乎无法被发现。', animationType: 'leafy-seadragon', depth: '3-50米' },
+            { name: 'Moorish Idol', chineseName: '镰鱼', category: '珊瑚礁鱼类', description: '冷知识：这种鱼在水族馆里极难饲养，因此也被称为“水族爱好者的噩梦”。', animationType: 'moorish-idol', depth: '3-180米' },
+            { name: 'Banggai Cardinalfish', chineseName: '邦盖红衣主教鱼', category: '珊瑚礁鱼类', description: '冷知识：它们是口孵鱼，鱼爸爸会把鱼卵含在嘴里直到孵化。', animationType: 'banggai-cardinalfish', depth: '1-16米' },
+            { name: 'Cleaner Wrasse', chineseName: '清洁鱼', category: '珊瑚礁鱼类', description: '冷知识：它们经营着“清洁站”，即使是凶猛的大鱼也会排队等候服务。', animationType: 'cleaner-wrasse', depth: '1-40米' },
+            { name: 'Trumpetfish', chineseName: '喇叭鱼', category: '珊瑚礁鱼类', description: '冷知识：它们会头朝下垂直伪装成珊瑚，或者“搭便车”躲在无害的大鱼旁边。', animationType: 'trumpetfish', depth: '1-130米' },
+            { name: 'Squirrelfish', chineseName: '松鼠鱼', category: '珊瑚礁鱼类', description: '冷知识：它们能通过鱼鳔发出类似松鼠的“吱吱”声，因此得名。', animationType: 'squirrelfish', depth: '1-180米' },
+            { name: 'Goatfish', chineseName: '山羊鱼', category: '珊瑚礁鱼类', description: '冷知识：它们下巴的触须是味觉器官，可以“品尝”沙子里的食物。', animationType: 'goatfish', depth: '1-100米' },
+            { name: 'Triggerfish', chineseName: '炮弹鱼', category: '珊瑚礁鱼类', description: '冷知识：它们会向沙中的螃蟹吹气，将其掀翻后再攻击其柔软的腹部。', animationType: 'triggerfish', depth: '1-50米' },
+            { name: 'Anglerfish', chineseName: '琵琶鱼', category: '深海鱼类', description: '冷知识：雄性琵琶鱼会寄生在雌性身上，最终融为一体，变成雌性的一个“器官”。', animationType: 'anglerfish', depth: '20-2000米' },
+            { name: 'Viperfish', chineseName: '蝰蛇鱼', category: '深海鱼类', description: '冷知识：它们的牙齿太长了，以至于嘴巴都合不上，只能暴露在外。', animationType: 'viperfish', depth: '250-5000米' },
+            { name: 'Goblin Shark', chineseName: '哥布林鲨', category: '深海鱼类', description: '冷知识：它们能像异形一样瞬间弹出下颚来捕捉猎物，场面十分惊悚。', animationType: 'ghost-shark', depth: '270-1300米' },
+            { name: 'Barreleye Fish', chineseName: '管眼鱼', category: '深海鱼类', description: '冷知识：我们看到的“眼睛”其实是它的鼻孔，真正的眼睛在透明的脑袋里向上看。', animationType: 'telescope-octopus', depth: '600-800米' },
+            { name: 'Frilled Shark', chineseName: '皱鳃鲨', category: '深海鱼类', description: '冷知识：它们的怀孕期可能长达3.5年，是所有脊椎动物中最长的。', animationType: 'frilled-shark', depth: '120-1500米' },
+            { name: 'Giant Squid', chineseName: '大王乌贼', category: '深海鱼类', description: '冷知识：它们的眼睛有篮球那么大，是动物王国中最大的眼睛。', animationType: 'giant-squid', depth: '300-1000米' },
+            { name: 'Vampire Squid', chineseName: '吸血鬼乌贼', category: '深海鱼类', description: '冷知识：遇到危险时，它会把带钉刺的“斗篷”翻过来盖住全身。', animationType: 'vampire-squid', depth: '600-900米' },
+            { name: 'Blobfish', chineseName: '水滴鱼', category: '深海鱼类', description: '冷知识：它们在深海的家乡其实长得不丑，悲伤的表情是上岸后减压造成的。', animationType: 'blobfish', depth: '600-1200米' },
+            { name: 'Dragonfish', chineseName: '龙鱼', category: '深海鱼类', description: '冷知识：它们是少数能看见红光的深海生物，相当于拥有了“红外夜视仪”。', animationType: 'dragonfish', depth: '200-1500米' },
+            { name: 'Lanternfish', chineseName: '灯笼鱼', category: '深海鱼类', description: '冷知识：它们通过调节光的亮度来伪装成从海面透下的月光，躲避捕食者。', animationType: 'lanternfish', depth: '200-1000米' },
+            { name: 'Oarfish', chineseName: '皇带鱼', category: '深海鱼类', description: '冷知识：古代水手传说中的“大海蛇”很可能就是这种鱼。', animationType: 'oarfish', depth: '200-1000米' },
+            { name: 'Coffinfish', chineseName: '棺材鱼', category: '深海鱼类', description: '冷知识：它们在捕食时可以屏住呼吸长达4分钟。', animationType: 'coffinfish', depth: '50-300米' },
+            { name: 'Telescope Octopus', chineseName: '望远镜章鱼', category: '深海鱼类', description: '冷知识：它们的眼睛可以旋转，以便观察来自任何方向的威胁。', animationType: 'telescope-octopus', depth: '100-2000米' },
+            { name: 'Fangtooth', chineseName: '尖牙鱼', category: '深海鱼类', description: '冷知识：它们的牙齿是所有鱼类中按身体比例最大的，但对人类无害。', animationType: 'fangtooth', depth: '200-2000米' },
+            { name: 'Gulper Eel', chineseName: '吞鳗', category: '深海鱼类', description: '冷知识：它们的尾巴末端会发光，可能会用来吸引猎物。', animationType: 'gulper-eel', depth: '500-3000米' },
+            { name: 'Manta Ray', chineseName: '蝠鲼', category: '大型海洋生物', description: '冷知识：它们拥有所有鱼类中最大的大脑与身体质量比，非常聪明。', animationType: 'manta-ray', depth: '0-1000米' },
+            { name: 'Whale Shark', chineseName: '鲸鲨', category: '大型海洋生物', description: '冷知识：它们背部的斑点就像人类的指纹一样，每一条都独一无二。', animationType: 'whale-shark', depth: '0-1800米' },
+            { name: 'Dolphin', chineseName: '海豚', category: '大型海洋生物', description: '冷知识：海豚在睡觉时，一半的大脑保持清醒，以警惕危险和呼吸。', animationType: 'dolphin', depth: '0-300米' },
+            { name: 'Swordfish', chineseName: '剑鱼', category: '大型海洋生物', description: '冷知识：它们眼睛旁边有特殊的器官，可以为大脑和眼睛加热，增强在冷水中的视力。', animationType: 'swordfish', depth: '0-800米' },
+            { name: 'Octopus', chineseName: '章鱼', category: '大型海洋生物', description: '冷知识：章鱼有三个心脏，两个负责给鳃供血，一个负责给身体其他部位供血。', animationType: 'octopus', depth: '0-2000米' },
+            { name: 'Hammerhead Shark', chineseName: '双髻鲨', category: '大型海洋生物', description: '冷知识：奇特的头型让它们拥有360°的立体视觉。', animationType: 'hammerhead-shark', depth: '0-1000米' },
+            { name: 'Turtle', chineseName: '海龟', category: '大型海洋生物', description: '冷知识：它们能利用地球磁场来导航，就像自带GPS一样。', animationType: 'turtle', depth: '0-1000米' },
+            { name: 'Great White Shark', chineseName: '大白鲨', category: '大型海洋生物', description: '冷知识：它们可以感知到数公里外一滴血所产生的电场。', animationType: 'great-white-shark', depth: '0-1200米' },
+            { name: 'Humpback Whale', chineseName: '座头鲸', category: '大型海洋生物', description: '冷知识：它们会团队合作，吐出环形的气泡网来捕食磷虾群。', animationType: 'humpback-whale', depth: '0-200米' },
+            { name: 'Blue Whale', chineseName: '蓝鲸', category: '大型海洋生物', description: '冷知识：蓝鲸的心脏有一辆小汽车那么大，发出的声音比喷气式飞机还响。', animationType: 'blue-whale', depth: '0-500米' },
+            { name: 'Orca', chineseName: '虎鲸', category: '大型海洋生物', description: '冷知识：不同的虎鲸种群有自己的“方言”，甚至有复杂的社会文化。', animationType: 'orca', depth: '0-1000米' },
+            { name: 'Beluga Whale', chineseName: '白鲸', category: '大型海洋生物', description: '冷知识：它们是唯一能向后游泳的鲸鱼。', animationType: 'beluga-whale', depth: '0-1000米' },
+            { name: 'Narwhal', chineseName: '独角鲸', category: '大型海洋生物', description: '冷知识：它们的“角”其实是一颗长出上唇的牙齿，布满了神经末梢。', animationType: 'narwhal', depth: '0-1500米' },
+            { name: 'Sunfish', chineseName: '翻车鱼', category: '大型海洋生物', description: '冷知识：雌性翻车鱼一次可产下3亿颗卵，是所有脊椎动物中最多的。', animationType: 'sunfish', depth: '0-600米' },
+            { name: 'Dugong', chineseName: '儒艮', category: '大型海洋生物', description: '冷知识：它们是现代大象的近亲，拥有不断生长的门牙。', animationType: 'dugong', depth: '0-40米' },
+        ];
 
-            // --- ELEMENTS ---
-            const landingScreen = document.getElementById('landing-screen');
-            const enterButton = document.getElementById('enter-button');
-            const mainContent = document.getElementById('main-content');
-            const fishGrid = document.getElementById('fish-grid');
-            const filterContainer = document.getElementById('filter-container');
-            const bubblesContainer = document.getElementById('bubbles-container');
-            const muteButton = document.getElementById('mute-button');
-            const volumeOnIcon = document.getElementById('volume-on-icon');
-            const volumeOffIcon = document.getElementById('volume-off-icon');
+        // Elements
+        const grid = document.getElementById('fish-grid');
+        const filterContainer = document.getElementById('filter-container');
+        const modal = document.getElementById('modal');
+        const modalContent = document.getElementById('modal-content');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+        const modalAnimation = document.getElementById('modal-animation');
+        const modalTitle = document.getElementById('modal-title');
+        const modalCategory = document.getElementById('modal-category');
+        const modalDescription = document.getElementById('modal-description');
+        const modalDepth = document.getElementById('modal-depth');
 
-            // --- AUDIO ---
-            let isMuted = false;
-            const ambientPlayer = new Tone.Player({
-                url: "https://tonejs.github.io/audio/berceuse.mp3", // Using a placeholder for underwater sounds
-                loop: true,
-                autostart: false,
-                volume: -15, // Lower volume for background effect
-                onload: () => {
-                    // This callback ensures the button is enabled only after the audio is loaded.
-                    enterButton.disabled = false;
-                    enterButton.textContent = '进入海洋世界';
-                }
-            }).toDestination();
-            
-            const noise = new Tone.Noise("pink").start();
-            const filter = new Tone.AutoFilter({
-                frequency: "8n",
-                baseFrequency: 200,
-                octaves: 3
-            }).toDestination().start();
-            noise.connect(filter);
-            noise.volume.value = -30;
-            
-            // --- FUNCTIONS ---
-            function createFishCard(fish) {
-                const card = document.createElement('div');
-                card.className = 'fish-card bg-black/30 backdrop-blur-md rounded-lg overflow-hidden shadow-lg cursor-pointer';
-                card.innerHTML = `
-                    <div class="relative">
-                        <img src="${fish.imageUrl}" alt="${fish.name}" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/400x300/3498db/ffffff?text=Image+Not+Found';">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                        <h3 class="absolute bottom-2 left-4 text-2xl font-bold">${fish.chineseName}</h3>
-                    </div>
-                    <div class="p-4">
-                        <p class="text-gray-300 text-sm">${fish.description}</p>
-                    </div>
-                `;
-                return card;
-            }
+        // Sounds
+        const hoverSound = new Tone.Synth({ oscillator: { type: "sine" }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination();
+        const clickSound = new Tone.Synth({ oscillator: { type: "triangle" }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.2, release: 0.2 } }).toDestination();
+        hoverSound.volume.value = -20;
+        clickSound.volume.value = -15;
 
-            function renderFish(category = 'all') {
-                fishGrid.innerHTML = '';
-                const filteredFish = category === 'all' 
-                    ? fishData 
-                    : fishData.filter(fish => fish.category === category);
-                
-                filteredFish.forEach(fish => {
-                    const card = createFishCard(fish);
-                    fishGrid.appendChild(card);
-                });
-            }
+        // Functions
+        function getFishSVG(type) {
+            const svgMap = {
+                clownfish: `<svg viewBox="0 0 150 100" class="w-4/5 h-auto clownfish-anim"><g><path d="M20,50 C40,20 110,20 130,50 C110,80 40,80 20,50 Z" fill="#f39c12"/><path d="M45,35 C50,30 55,30 60,35 L60,65 C55,70 50,70 45,65 Z" fill="white" stroke="black" stroke-width="2"/><path d="M90,30 C95,25 100,25 105,30 L105,70 C100,75 95,75 90,70 Z" fill="white" stroke="black" stroke-width="2"/><circle cx="35" cy="50" r="4" fill="black"/><path d="M130,50 C140,40 145,60 130,50 Z" fill="#f39c12" stroke="black" stroke-width="1"/></g></svg>`,
+                mandarinfish: `<svg viewBox="0 0 150 100" class="w-4/5 h-auto mandarinfish-anim"><g><path d="M25,50 C40,25 100,25 120,50 C100,75 40,75 25,50 Z" fill="#3498db"/><path d="M30,50 C40,40 60,40 70,50 C60,60 40,60 30,50 Z" fill="#e67e22" opacity="0.8"/><circle cx="80" cy="45" r="5" fill="#2ecc71"/><circle cx="95" cy="55" r="7" fill="#2ecc71"/><circle cx="40" cy="50" r="3" fill="black"/><path d="M120,50 C135,40 135,60 120,50 Z" fill="#3498db" stroke="#2980b9" stroke-width="1"/></g></svg>`,
+                'regal-tang': `<svg viewBox="0 0 150 100" class="w-4/5 h-auto regal-tang-anim"><g transform="scale(0.9)"><path d="M20,50 C50,20 100,25 110,50 C100,75 50,80 20,50 Z" fill="#2980b9"/><path d="M110,50 C140,20 140,80 110,50 Z" fill="#f1c40f"/><path d="M60,40 C90,45 90,55 60,60 Z" fill="black"/><circle cx="35" cy="50" r="3" fill="white"/></g></svg>`,
+                lionfish: `<svg viewBox="0 0 150 100" class="w-4/5 h-auto lionfish-anim"><g><path d="M50,50 C60,40 90,40 100,50 C90,60 60,60 50,50 Z" fill="#c0392b"/><path d="M55,50 C65,45 85,45 95,50 C85,55 65,55 55,50 Z" fill="white"/><circle cx="75" cy="50" r="3" fill="black"/><line x1="75" y1="5" x2="75" y2="38" stroke="white" stroke-width="2"/><line x1="75" y1="62" x2="75" y2="95" stroke="white" stroke-width="2"/><line x1="30" y1="20" x2="50" y2="45" stroke="white" stroke-width="2"/><line x1="120" y1="20" x2="100" y2="45" stroke="white" stroke-width="2"/><line x1="30" y1="80" x2="50" y2="55" stroke="white" stroke-width="2"/><line x1="120" y1="80" x2="100" y2="55" stroke="white" stroke-width="2"/></g></svg>`,
+                anglerfish: `<svg viewBox="0 0 150 100" class="w-4/5 h-auto anglerfish-anim"><g><path d="M20,60 C-10,90 100,120 130,50 C90,10 40,10 20,60 Z" fill="#34495e"/><line x1="70" y1="20" x2="80" y2="10" stroke="white" stroke-width="2"/><circle cx="81" cy="9" r="5" class="lure-light" fill="#f1c40f"/><circle cx="40" cy="55" r="3" fill="white"/><path d="M110,55 C120,50 125,60 110,55 Z" fill="#34495e" stroke="#95a5a6" stroke-width="1"/></g></svg>`,
+                viperfish: `<svg viewBox="0 0 150 100" class="w-4/5 h-auto viperfish-anim"><g><path d="M10,50 C50,40 100,40 140,50 L130,55 C90,65 40,65 10,55 Z" fill="#2c3e50"/><circle cx="25" cy="50" r="2" fill="yellow"/><path d="M20,53 L25,60 L30,53 M35,53 L40,60 L45,53" fill="none" stroke="white" stroke-width="1.5"/></g></svg>`,
+                'manta-ray': `<svg viewBox="0 0 150 100" class="w-4/5 h-auto manta-ray-anim"><g><path d="M75,10 L140,50 C120,55 90,55 75,50 L60,55 C30,55 10,50 75,10 Z" fill="#5d6d7e"/><path d="M75,50 L90,90 L60,90 Z" fill="#5d6d7e"/></g></svg>`,
+                'whale-shark': `<svg viewBox="0 0 150 100" class="w-3/4 h-auto whale-shark-anim"><g><rect x="10" y="30" width="130" height="40" rx="20" fill="#bdc3c7"/><circle cx="30" cy="45" r="2" fill="white"/><circle cx="50" cy="55" r="3" fill="white"/><circle cx="70" cy="40" r="2" fill="white"/><circle cx="90" cy="50" r="4" fill="white"/><circle cx="110" cy="42" r="2.5" fill="white"/><circle cx="130" cy="55" r="2" fill="white"/><path d="M140,50 C150,40 150,60 140,50 Z" fill="#95a5a6"/></g></svg>`,
+                seahorse: `<svg viewBox="0 0 100 100" class="h-4/5 w-auto seahorse-anim"><g><path d="M50,10 C70,10 70,30 50,30 C30,30 30,10 50,10 Z" fill="#2ecc71"/><path d="M50,30 C55,40 55,60 50,70 C45,80 35,90 40,80 C45,70 50,60 50,30 Z" fill="#2ecc71"/><path d="M50,70 C60,75 70,85 60,95 C50,105 40,95 50,70 Z" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/></g></svg>`,
+                jellyfish: `<svg viewBox="0 0 100 100" class="h-4/5 w-auto jellyfish-anim"><g><path d="M20,50 C20,20 80,20 80,50 Z" fill="rgba(255,255,255,0.5)"/><line class="tentacle" x1="30" y1="50" x2="30" y2="80" stroke="rgba(255,255,255,0.5)" stroke-width="3"/><line class="tentacle" style="animation-delay: -0.2s" x1="50" y1="50" x2="50" y2="90" stroke="rgba(255,255,255,0.5)" stroke-width="3"/><line class="tentacle" style="animation-delay: -0.4s" x1="70" y1="50" x2="70" y2="80" stroke="rgba(255,255,255,0.5)" stroke-width="3"/></g></svg>`,
+                dolphin: `<svg viewBox="0 0 150 100" class="w-4/5 h-auto dolphin-anim"><g><path d="M20,50 C40,20 120,30 130,50 C120,70 40,80 20,50 Z" fill="#3498db"/><path d="M100,45 L120,40 L110,50 Z" fill="white" opacity="0.8"/></g></svg>`,
+                pufferfish: `<svg viewBox="0 0 100 100" class="w-3/4 h-3/4 pufferfish-anim"><g><circle cx="50" cy="50" r="40" fill="#f1c40f"/><circle cx="35" cy="40" r="5" fill="white"/><circle cx="37" cy="40" r="2" fill="black"/><line x1="50" y1="10" x2="50" y2="2" stroke="black" stroke-width="2"/><line x1="50" y1="90" x2="50" y2="98" stroke="black" stroke-width="2"/></g></svg>`,
+                swordfish: `<svg viewBox="0 0 150 100" class="w-full h-auto swordfish-anim"><g><path d="M50,50 C70,40 130,40 140,50 C130,60 70,60 50,50 Z" fill="#7f8c8d"/><path d="M50,50 L-20,50" stroke="#bdc3c7" stroke-width="4"/></g></svg>`,
+                octopus: `<svg viewBox="0 0 100 100" class="w-3/4 h-3/4 octopus-anim"><g><circle cx="50" cy="30" r="25" fill="#e74c3c"/><path d="M25,55 Q30,70 20,80 M75,55 Q70,70 80,80 M40,55 Q50,80 45,90 M60,55 Q50,80 55,90" stroke="#e74c3c" stroke-width="4" fill="none"/></g></svg>`,
+                'hammerhead-shark': `<svg viewBox="0 0 150 100" class="w-4/5 h-auto hammerhead-shark-anim"><g><path d="M50,50 C70,40 130,45 140,50 C130,55 70,60 50,50 Z" fill="#95a5a6"/><path d="M50,50 L30,30 L70,30 Z" fill="#7f8c8d"/></g></svg>`,
+                eel: `<svg viewBox="0 0 150 100" class="w-full h-auto eel-anim"><g><path d="M10,50 C 40,30 80,70 140,50" stroke="#2c3e50" stroke-width="8" fill="none"/></g></svg>`,
+                turtle: `<svg viewBox="0 0 150 100" class="w-4/5 h-auto turtle-anim"><g><ellipse cx="75" cy="50" rx="50" ry="30" fill="#27ae60"/><circle cx="30" cy="50" r="10" fill="#2ecc71"/><path d="M125,50 L140,40 L140,60 Z" fill="#2ecc71"/></g></svg>`,
+                butterflyfish: `<svg viewBox="0 0 150 100" class="w-4/5 h-auto butterflyfish-anim"><g><path d="M75,50 m -50,0 a 50,40 0 1,0 100,0 a 50,40 0 1,0 -100,0" fill="#f1c40f"/><path d="M75,30 L75,70" stroke="black" stroke-width="3"/><circle cx="40" cy="50" r="5" fill="black"/></g></svg>`,
+                parrotfish: `<svg viewBox="0 0 150 100" class="w-4/5 h-auto parrotfish-anim"><g><path d="M20,50 C40,20 110,20 130,50 C110,80 40,80 20,50 Z" fill="#1abc9c"/><path d="M20,50 C10,45 10,55 20,50Z" fill="#e74c3c"/></g></svg>`,
+                'emperor-angelfish': `<svg viewBox="0 0 150 100" class="w-4/5 h-auto emperor-angelfish-anim"><g><path d="M25,50 C50,10 100,10 125,50 C100,90 50,90 25,50 Z" fill="#3498db"/><path d="M30,50 C50,20 90,20 110,50" stroke="#f1c40f" stroke-width="4" fill="none"/></g></svg>`,
+                boxfish: `<svg viewBox="0 0 100 100" class="w-3/4 h-3/4 boxfish-anim"><g><rect x="20" y="20" width="60" height="60" rx="10" fill="yellow" stroke="orange" stroke-width="3"/></g></svg>`,
+                damselfish: `<svg viewBox="0 0 150 100" class="w-4/5 h-auto damselfish-anim"><g><path d="M20,50 C40,30 100,30 120,50 C100,70 40,70 20,50 Z" fill="#9b59b6"/></g></svg>`,
+                'ghost-shark': `<svg viewBox="0 0 150 100" class="w-4/5 h-auto ghost-shark-anim"><g><path d="M10,50 C50,20 120,30 140,50 C120,70 50,80 10,50 Z" fill="#bdc3c7"/></g></svg>`,
+                starfish: `<svg viewBox="0 0 100 100" class="w-3/4 h-3/4 starfish-anim"><g><path d="M50,5 L61,39 L98,39 L68,61 L79,95 L50,75 L21,95 L32,61 L2,39 L39,39 Z" fill="#e67e22"/></g></svg>`,
+                'leafy-seadragon': `<svg viewBox="0 0 100 100" class="h-4/5 w-auto leafy-seadragon-anim"><g><path d="M50,20 C60,30 40,40 50,50 C60,60 40,70 50,80" stroke="#27ae60" stroke-width="3" fill="none"/><path d="M55,25 L70,15 M45,45 L30,35 M55,75 L70,65" stroke="#27ae60" stroke-width="3" fill="none"/></g></svg>`,
+                'moorish-idol': `<svg viewBox="0 0 150 100" class="w-4/5 h-auto moorish-idol-anim"><g><path d="M75,50 m-40,0 a 40,30 0 1,0 80,0 a 40,30 0 1,0 -80,0" fill="yellow"/><path d="M75,20 L75,80" stroke="black" stroke-width="15"/><path d="M75,10 L100,5 L75,50" fill="black"/></g></svg>`,
+                'banggai-cardinalfish': `<svg viewBox="0 0 150 100" class="w-4/5 h-auto banggai-cardinalfish-anim"><g><path d="M25,50 C50,25 100,25 125,50 C100,75 50,75 25,50 Z" fill="white" stroke="black"/><path d="M40,28 L40,72 M80,25 L80,75" stroke="black" stroke-width="8"/></g></svg>`,
+                'cleaner-wrasse': `<svg viewBox="0 0 150 100" class="w-full h-auto cleaner-wrasse-anim"><g><path d="M10,50 C 50,45 100,55 140,50" stroke="#3498db" stroke-width="6" fill="none"/><path d="M50,50 L140,50" stroke="black" stroke-width="2" fill="none"/></g></svg>`,
+                trumpetfish: `<svg viewBox="0 0 150 100" class="w-full h-auto trumpetfish-anim"><g><rect x="10" y="48" width="130" height="4" fill="#f1c40f"/></g></svg>`,
+                squirrelfish: `<svg viewBox="0 0 150 100" class="w-4/5 h-auto squirrelfish-anim"><g><path d="M20,50 C40,20 110,20 130,50 C110,80 40,80 20,50 Z" fill="#e74c3c"/><circle cx="45" cy="45" r="10" fill="white"/><circle cx="47" cy="45" r="5" fill="black"/></g></svg>`,
+                goatfish: `<svg viewBox="0 0 150 100" class="w-4/5 h-auto goatfish-anim"><g><path d="M20,50 C40,30 110,30 130,50 C110,70 40,70 20,50 Z" fill="#bdc3c7"/><path d="M30,60 Q35,75 25,80 M40,60 Q45,75 35,80" stroke="black" stroke-width="2" fill="none"/></g></svg>`,
+                triggerfish: `<svg viewBox="0 0 150 100" class="w-4/5 h-auto triggerfish-anim"><g><path d="M25,50 C60,10 100,10 125,50 C100,90 60,90 25,50 Z" fill="#9b59b6"/><path d="M75,15 L85,5 L75,30" fill="black"/></g></svg>`,
+                'frilled-shark': `<svg viewBox="0 0 150 100" class="w-full h-auto frilled-shark-anim"><g><path d="M10,50 C 40,40 80,60 140,50" stroke="#7f8c8d" stroke-width="10" fill="none"/><path d="M30,45 L30,55 M50,43 L50,57" stroke="#34495e" stroke-width="2"/></g></svg>`,
+                'giant-squid': `<svg viewBox="0 0 100 100" class="w-3/4 h-3/4 giant-squid-anim"><g><path d="M50,10 L20,40 L80,40 Z" fill="#c0392b"/><path d="M40,40 Q20,60 30,90 M60,40 Q80,60 70,90" stroke="#c0392b" stroke-width="5" fill="none"/></g></svg>`,
+                'vampire-squid': `<svg viewBox="0 0 100 100" class="w-3/4 h-3/4 vampire-squid-anim"><g><path d="M20,20 L80,20 L50,60 Z" fill="#e74c3c"/><path d="M20,20 Q30,50 10,80 M80,20 Q70,50 90,80" stroke="#e74c3c" stroke-width="4" fill="none"/></g></svg>`,
+                blobfish: `<svg viewBox="0 0 100 100" class="w-3/4 h-3/4 blobfish-anim"><g><path d="M20,50 C20,80 80,80 80,50 C80,20 20,20 20,50 Z" fill="#ecf0f1" opacity="0.8"/><path d="M40,60 Q50,70 60,60" stroke="black" stroke-width="2" fill="none"/></g></svg>`,
+                dragonfish: `<svg viewBox="0 0 150 100" class="w-full h-auto dragonfish-anim"><g><path d="M10,50 C 50,48 100,52 140,50" stroke="#2c3e50" stroke-width="5" fill="none"/><circle cx="120" cy="60" r="4" fill="red"/></g></svg>`,
+                lanternfish: `<svg viewBox="0 0 150 100" class="w-4/5 h-auto lanternfish-anim"><g><path d="M20,50 C40,30 100,30 120,50 C100,70 40,70 20,50 Z" fill="#34495e"/><circle cx="40" cy="55" r="2" fill="cyan"/><circle cx="60" cy="58" r="2" fill="cyan"/><circle cx="80" cy="55" r="2" fill="cyan"/></g></svg>`,
+                oarfish: `<svg viewBox="0 0 150 100" class="w-full h-auto oarfish-anim"><g><path d="M10,50 C 50,20 100,80 140,50" stroke="#bdc3c7" stroke-width="4" fill="none"/><path d="M10,50 L10,20" stroke="red" stroke-width="2"/></g></svg>`,
+                coffinfish: `<svg viewBox="0 0 100 100" class="w-3/4 h-3/4 coffinfish-anim"><g><ellipse cx="50" cy="60" rx="40" ry="30" fill="#e74c3c"/><path d="M30,90 L20,100 M70,90 L80,100" stroke="black" stroke-width="3" fill="none"/></g></svg>`,
+                'telescope-octopus': `<svg viewBox="0 0 100 100" class="w-3/4 h-3/4 telescope-octopus-anim"><g><circle cx="50" cy="50" r="20" fill="#9b59b6" opacity="0.5"/><rect x="35" y="20" width="10" height="20" fill="#ecf0f1"/><rect x="55" y="20" width="10" height="20" fill="#ecf0f1"/></g></svg>`,
+                fangtooth: `<svg viewBox="0 0 150 100" class="w-4/5 h-auto fangtooth-anim"><g><path d="M20,50 C50,20 100,20 130,50 C100,80 50,80 20,50 Z" fill="#34495e"/><path d="M30,45 L35,60 M40,45 L45,60" stroke="white" stroke-width="2" fill="none"/></g></svg>`,
+                'gulper-eel': `<svg viewBox="0 0 150 100" class="w-full h-auto gulper-eel-anim"><g><path d="M10,50 C 20,20 60,20 70,50 C 60,80 20,80 10,50 Z" fill="#2c3e50"/><path d="M70,50 C 90,48 120,52 140,50" stroke="#2c3e50" stroke-width="4" fill="none"/></g></svg>`,
+                'great-white-shark': `<svg viewBox="0 0 150 100" class="w-4/5 h-auto great-white-shark-anim"><g><path d="M10,50 C40,30 130,30 140,50 C130,70 40,70 10,50 Z" fill="#95a5a6"/><path d="M10,50 C40,65 130,65 140,50" fill="white"/></g></svg>`,
+                'humpback-whale': `<svg viewBox="0 0 150 100" class="w-4/5 h-auto humpback-whale-anim"><g><path d="M10,50 C30,20 130,20 140,50 C130,80 30,80 10,50 Z" fill="#34495e"/><path d="M20,60 L60,70" stroke="white" stroke-width="3"/></g></svg>`,
+                'blue-whale': `<svg viewBox="0 0 150 100" class="w-full h-auto blue-whale-anim"><g><path d="M5,50 C20,30 140,30 145,50 C140,70 20,70 5,50 Z" fill="#2980b9"/></g></svg>`,
+                orca: `<svg viewBox="0 0 150 100" class="w-4/5 h-auto orca-anim"><g><path d="M10,50 C30,25 130,25 140,50 C130,75 30,75 10,50 Z" fill="black"/><path d="M80,45 C90,35 110,35 100,45" fill="white"/><path d="M75,20 L75,10" stroke="black" stroke-width="8"/></g></svg>`,
+                'beluga-whale': `<svg viewBox="0 0 150 100" class="w-4/5 h-auto beluga-whale-anim"><g><path d="M10,50 C30,20 130,20 140,50 C130,80 30,80 10,50 Z" fill="#ecf0f1"/><path d="M40,30 C50,20 70,20 60,30" fill="#bdc3c7"/></g></svg>`,
+                narwhal: `<svg viewBox="0 0 150 100" class="w-full h-auto narwhal-anim"><g><path d="M40,50 C60,30 130,30 140,50 C130,70 60,70 40,50 Z" fill="#bdc3c7"/><path d="M40,50 L-30,50" stroke="white" stroke-width="3"/></g></svg>`,
+                sunfish: `<svg viewBox="0 0 100 100" class="w-3/4 h-3/4 sunfish-anim"><g><circle cx="50" cy="50" r="45" fill="#bdc3c7"/><path d="M50,5 L50,25 M50,95 L50,75" stroke="#95a5a6" stroke-width="10"/></g></svg>`,
+                dugong: `<svg viewBox="0 0 150 100" class="w-4/5 h-auto dugong-anim"><g><path d="M10,50 C30,30 120,30 140,50 C120,70 30,70 10,50 Z" fill="#95a5a6"/><path d="M140,50 C150,40 150,60 140,50 Z" fill="#7f8c8d"/></g></svg>`,
+            };
+            return svgMap[type] || svgMap['clownfish']; // Fallback
+        }
 
-            function createBubble() {
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble';
-                const size = Math.random() * 40 + 10 + 'px';
-                bubble.style.width = size;
-                bubble.style.height = size;
-                bubble.style.left = Math.random() * 100 + 'vw';
-                bubble.style.animationDuration = Math.random() * 5 + 8 + 's';
-                bubble.style.animationDelay = Math.random() * 5 + 's';
-                bubblesContainer.appendChild(bubble);
-
-                setTimeout(() => {
-                    bubble.remove();
-                }, 13000);
-            }
-            
-            // --- EVENT LISTENERS ---
-            enterButton.addEventListener('click', () => {
-                // Tone.start() is crucial for starting audio context in browsers.
+        function createFishCard(fish) {
+            const card = document.createElement('div');
+            card.className = 'fish-card perspective-1000';
+            card.innerHTML = `
+                <div class="p-4 flex flex-col h-full">
+                    <div class="fish-animation-container flex-grow">${getFishSVG(fish.animationType)}</div>
+                    <h3 class="mt-4 text-center text-xl font-bold text-cyan-200">${fish.chineseName}</h3>
+                </div>
+            `;
+            card.addEventListener('click', () => {
                 Tone.start();
-                if (!isMuted) {
-                    // This will now work because the button is only clickable after the player is loaded.
-                    if (ambientPlayer.loaded) {
-                        ambientPlayer.start();
-                    }
-                    noise.volume.value = -30;
-                }
-                landingScreen.style.opacity = '0';
-                setTimeout(() => {
-                    landingScreen.style.display = 'none';
-                    mainContent.style.display = 'block';
-                    document.body.style.overflow = 'auto';
-                    setTimeout(() => {
-                        mainContent.style.opacity = '1';
-                    }, 50);
-                }, 1000);
+                clickSound.triggerAttackRelease("C5", "8n");
+                openModal(fish);
             });
-
-            filterContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('filter-btn')) {
-                    const category = e.target.dataset.category;
-                    renderFish(category);
-                    
-                    // Update active button style
-                    document.querySelectorAll('.filter-btn').forEach(btn => {
-                        btn.classList.remove('bg-white/40');
-                        btn.classList.add('bg-white/10');
-                    });
-                    e.target.classList.remove('bg-white/10');
-                    e.target.classList.add('bg-white/40');
-                }
+            card.addEventListener('mouseenter', () => {
+                Tone.start();
+                hoverSound.triggerAttackRelease("C6", "16n");
             });
+            return card;
+        }
 
-            muteButton.addEventListener('click', () => {
-                isMuted = !isMuted;
-                if (isMuted) {
-                    ambientPlayer.stop();
-                    noise.volume.value = -Infinity;
-                    volumeOnIcon.classList.add('hidden');
-                    volumeOffIcon.classList.remove('hidden');
-                } else {
-                    if(Tone.context.state === 'running' && ambientPlayer.loaded) {
-                       ambientPlayer.start();
-                       noise.volume.value = -30;
-                    }
-                    volumeOnIcon.classList.remove('hidden');
-                    volumeOffIcon.classList.add('hidden');
-                }
+        function renderFish(category = 'all') {
+            grid.innerHTML = '';
+            const filteredFish = category === 'all' ? fishData : fishData.filter(f => f.category === category);
+            filteredFish.forEach(fish => grid.appendChild(createFishCard(fish)));
+        }
+
+        function openModal(fish) {
+            modalAnimation.innerHTML = getFishSVG(fish.animationType).replace('w-4/5', 'w-3/5').replace('h-auto', 'h-full');
+            modalTitle.textContent = fish.chineseName;
+            modalCategory.textContent = fish.category;
+            modalDescription.textContent = fish.description;
+            modalDepth.textContent = fish.depth;
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('modal-enter'), 10);
+        }
+
+        function closeModal() {
+            modal.classList.add('modal-leave-to');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('modal-leave-to');
+            }, 300);
+        }
+
+        function createFilterButtons() {
+            const categories = ['all', ...new Set(fishData.map(f => f.category))];
+            const categoryNames = { all: '全部物种', '珊瑚礁鱼类': '珊瑚礁', '深海鱼类': '深海', '大型海洋生物': '大型生物' };
+            filterContainer.innerHTML = '';
+            categories.forEach(cat => {
+                const button = document.createElement('button');
+                button.className = 'px-4 py-2 text-sm rounded-full transition-colors duration-300 border border-cyan-400/50 hover:bg-cyan-400/20';
+                button.textContent = categoryNames[cat];
+                button.dataset.category = cat;
+                if (cat === 'all') button.classList.add('bg-cyan-400/20');
+                button.addEventListener('click', () => {
+                    clickSound.triggerAttackRelease("A4", "8n");
+                    document.querySelectorAll('#filter-container button').forEach(btn => btn.classList.remove('bg-cyan-400/20'));
+                    button.classList.add('bg-cyan-400/20');
+                    renderFish(cat);
+                });
+                filterContainer.appendChild(button);
             });
+        }
 
-            // --- INITIALIZATION ---
-            renderFish(); // Initial render of all fish
-            setInterval(createBubble, 500); // Create bubbles periodically
+        // Event Listeners
+        modalCloseBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
         });
+
+        // Initialization
+        createFilterButtons();
+        renderFish();
+    });
     </script>
 </body>
 </html>
